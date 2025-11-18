@@ -29,7 +29,6 @@ h2 {
     font-size: 1.5em;
     font-weight: 600;
     margin-top: 0;
-    /* Spacing added below section title */
     margin-bottom: 15px; 
 }
 
@@ -44,11 +43,10 @@ h2 {
     transition: transform 0.2s;
 }
 
-/* Base question label */
+/* Base question label (Increased spacing) */
 label {
     display: block;
     font-weight: 600;
-    /* Increased margin for better separation, as requested */
     margin-top: 25px; 
     margin-bottom: 15px; 
     color: var(--primary-color); 
@@ -97,25 +95,17 @@ button[type="submit"]:hover, #download-csv-button:hover {
 /* --- 4. RADIO & CHECKBOX GROUPS (Modern Look) --- */
 
 .radio-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    /* CRITICAL FIX: Removed display: flex to force vertical stacking */
+    gap: 0; 
     margin-top: 10px;
-}
-
-/* Style for individual radio/checkbox labels */
-.radio-option {
-    flex: 1 1 auto; 
-    min-width: 120px;
 }
 
 /* Checkbox Style (Unified Look) */
 .checkbox-option {
-    margin: 10px 0;
+    margin: 0 0 8px 0; /* Added bottom margin for spacing */
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Added base padding/border/background to match the radio options look */
     padding: 10px 15px; 
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -166,12 +156,13 @@ button[type="submit"]:hover, #download-csv-button:hover {
 /* Style the label wrapper as the visible button */
 .radio-option {
     display: block; 
+    width: 100%; /* Ensures it takes up full width when stacked */
+    margin-bottom: 8px; /* Vertical spacing between options */
     padding: 12px 15px;
-    /* CRITICAL FIX: Ensure the default border loads */
     border: 1px solid var(--border-color) !important; 
     border-radius: 8px;
     cursor: pointer;
-    text-align: center;
+    text-align: left; /* Aligns text left for better readability when wide */
     font-weight: 400;
     transition: all 0.2s;
 }
@@ -183,7 +174,6 @@ button[type="submit"]:hover, #download-csv-button:hover {
 }
 
 /* Checked/Selected State */
-/* CRITICAL FIX: Simplified and enforced selector for checked radio buttons */
 .radio-option:has(input[type="radio"]:checked) {
     background-color: var(--primary-color) !important;
     color: white !important;
