@@ -197,15 +197,14 @@ function matchTopAgencies(allData, answers, topN = 3) {
 // --- FORM HANDLER AND DISPLAY ---
 
 function getFormAnswers() {
-    // Collects all user answers from the HTML form
-
     // Text inputs still use getElementById
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     
     // Radio buttons now use the custom getRadioValue function and name attribute
     const baseIncome = parseInt(getRadioValue('income'));
-    const partnerIncome = parseInt(getRadioValue('partner_income') || 0); // Default to 0 if not selected
+    // Use || 0 to ensure partnerIncome doesn't break math if left null
+    const partnerIncome = parseInt(getRadioValue('partner_income') || 0); 
     const bedrooms = parseInt(getRadioValue('bedrooms'));
     const dependents = parseInt(getRadioValue('dependents'));
     const pets = parseInt(getRadioValue('pets'));
@@ -258,11 +257,10 @@ function displayResults(matches, answers) {
         `;
     });
     
-    // ADDED: The CSV Download Button
+    // The CSV Download Button is added here
     const downloadButton = document.createElement('button');
     downloadButton.id = 'download-csv-button';
     downloadButton.textContent = 'Download Matches (CSV)';
-    // Attach the generateCSV function, passing the results and user answers
     downloadButton.addEventListener('click', () => generateCSV(matches, answers)); 
     resultsDiv.appendChild(downloadButton);
 }
@@ -272,19 +270,35 @@ function runSurvey(event) {
     
     const answers = getFormAnswers();
 
-    // Check if critical inputs (like income and bedrooms) were successfully parsed
-    if (isNaN(answers.total_income) || isNaN(answers.bedrooms)) {
+    // CRITICAL VALIDATION CHECK: Check ALL required fields (numeric and string)
+    const requiredNumericFields = [
+        answers.total_income,
+        answers.bedrooms,
+        answers.dependents,
+        answers.pets
+    ];
+    
+    const requiredStringFields = [
+        answers.current_housing,
+        answers.eviction,
+        answers.criminal_record,
+        answers.needs_transit
+    ];
+    
+    const isInvalid = requiredNumericFields.some(val => isNaN(val)) || 
+                      requiredStringFields.some(val => val === null);
+
+    if (isInvalid) {
         document.getElementById('results-container').innerHTML = 
-            '<h2>Error: Please complete all required sections (Income, Bedrooms, etc.)</h2>';
+            '<h2>🛑 Error: Please complete ALL required selections.</h2><p>You must select one option for every single question in the "Core Needs," "Current Situation," and "Other Factors" sections to get a match.</p>';
+        
+        document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
         return;
     }
     
     const topMatches = matchTopAgencies(HOUSING_DATA, answers, 3);
     
-    // Pass answers to displayResults for use in the CSV generator
     displayResults(topMatches, answers); 
-
-    // Scroll to results
     document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 }
 
