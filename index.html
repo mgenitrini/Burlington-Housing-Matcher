@@ -290,22 +290,37 @@
 
             <div class="form-group">
                 <h2>Other Factors</h2>
-                <div class="checkbox-option">
-                    <input type="checkbox" id="eviction">
-                    <label for="eviction">Do you have a previous eviction on your record?</label>
-                </div>
                 
-                <div class="checkbox-option">
-                    <input type="checkbox" id="criminal_record">
-                    <label for="criminal_record">Do you have a criminal record?</label>
+                <label>Do you have a previous eviction on your record?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="eviction" value="Yes" required> Yes
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="eviction" value="No"> No
+                    </label>
                 </div>
 
-                <div class="checkbox-option">
-                    <input type="checkbox" id="needs_transit">
-                    <label for="needs_transit">Do you need easy access to public transportation?</label>
+                <label>Do you have a criminal record?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="criminal_record" value="Yes" required> Yes
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="criminal_record" value="No"> No
+                    </label>
                 </div>
 
-            </div>
+                <label>Do you need easy access to public transportation?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="needs_transit" value="Yes" required> Yes
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="needs_transit" value="No"> No
+                    </label>
+                </div>
+                </div>
 
             <button type="submit">Find My Matches</button>
         </form>
