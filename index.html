@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burlington Housing Matcher</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        label { display: block; font-weight: bold; margin-top: 10px; }
+        input[type="text"], select { width: 100%; padding: 8px; margin-top: 5px; margin-bottom: 15px; box-sizing: border-box; }
+        .match-result { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background-color: #f9f9f9; }
+        .match-result h3 { color: #007bff; }
+        #results-container { margin-top: 30px; }
+        .form-group { border: 1px solid #eee; padding: 15px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div id="survey-container">
+        <h1>Housing Match Survey</h1>
+        <p>Answer the following questions to find your top 3 housing matches in Burlington, NC.</p>
+        
+        <form id="housing-survey">
+            <div class="form-group">
+                <label for="name">Your full name:</label>
+                <input type="text" id="name" required>
+
+                <label for="email">Your email:</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <h2>Core Needs</h2>
+                
+                <label for="income">Monthly income:</label>
+                <select id="income" required>
+                    <option value="0">Select...</option>
+                    <option value="1250">In between 1,000–1,500</option>
+                    <option value="1750">In between 1,500–2,000</option>
+                    <option value="2500">Over 2,000</option>
+                </select>
+
+                <label for="partner_income">Partner's monthly income (if applicable):</label>
+                <select id="partner_income" required>
+                    <option value="0">I do not combine income</option>
+                    <option value="750">Under 1,000</option>
+                    <option value="1250">1,000–1,500</option>
+                    <option value="1750">1,500–2,000</option>
+                    <option value="2500">Over 2,000</option>
+                </select>
+
+                <label for="bedrooms">Bedroom amount preference:</label>
+                <select id="bedrooms" required>
+                    <option value="0">Select...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+
+                <label for="dependents">Do you have dependents? If so, how many?</label>
+                <select id="dependents" required>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3+</option>
+                </select>
+
+                <label for="pets">Pet situation:</label>
+                <select id="pets" required>
+                    <option value="0">No pets</option>
+                    <option value="1">1 pet</option>
+                    <option value="2">2+ pets</option>
+                </select>
+                
+                <label for="needs_accessible">Do you need disability accessible housing?</label>
+                <select id="needs_accessible" required>
+                    <option value="false">No, I do not</option>
+                    <option value="semi">Not fully accessible (few stairs, grab railings, first floor)</option>
+                    <option value="true">Yes, fully accessible (wheelchair, ramps, wide doors, valet trash)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <h2>Current Situation</h2>
+                <label for="current_housing">Current housing situation:</label>
+                <select id="current_housing" required>
+                    <option value="Staying with friends or family">Staying with friends or family</option>
+                    <option value="At risk of losing housing">At risk of losing housing</option>
+                    <option value="Currently unhoused">Currently unhoused</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <h2>Other Factors</h2>
+                <input type="checkbox" id="eviction">
+                <label for="eviction" style="display: inline;">Do you have a previous eviction on your record?</label><br><br>
+                
+                <input type="checkbox" id="criminal_record">
+                <label for="criminal_record" style="display: inline;">Do you have a criminal record?</label><br><br>
+
+                <input type="checkbox" id="needs_transit">
+                <label for="needs_transit" style="display: inline;">Do you need easy access to public transportation?</label><br><br>
+
+            </div>
+
+            <button type="submit">Find My Matches</button>
+        </form>
+    </div>
+
+    <div id="results-container">
+        <h2>Top 3 Suggested Housing Options</h2>
+    </div>
+
+    <script src="housing_data.json"></script>
+    <script src="script.js"></script>
+</body>
+</html>
