@@ -43,12 +43,13 @@ h2 {
     transition: transform 0.2s;
 }
 
+/* Base question label */
 label {
     display: block;
     font-weight: 600;
     margin-top: 15px;
     margin-bottom: 5px;
-    color: var(--primary-color); /* Emphasize question labels */
+    color: var(--primary-color); 
 }
 
 /* --- 3. INPUTS & BUTTONS --- */
@@ -83,6 +84,7 @@ button[type="submit"], #download-csv-button {
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
     margin-top: 20px;
+    display: block; 
 }
 
 button[type="submit"]:hover, #download-csv-button:hover {
@@ -92,22 +94,45 @@ button[type="submit"]:hover, #download-csv-button:hover {
 
 /* --- 4. RADIO & CHECKBOX GROUPS (Modern Look) --- */
 
-.radio-group, .checkbox-option {
-    display: flex; /* Use flexbox for horizontal layout */
+.radio-group {
+    display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
 }
 
 /* Style for individual radio/checkbox labels */
-.radio-option, .checkbox-option label {
-    flex: 1 1 auto; /* Allows options to grow/shrink but keep a base size */
+.radio-option {
+    flex: 1 1 auto; 
     min-width: 120px;
 }
 
-/* Hide default radio/checkbox inputs */
-.radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
-    /* Hide the actual input but keep it functional */
+/* Ensure inline display for checkbox labels */
+.checkbox-option {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Style for text next to checkboxes */
+.checkbox-option label {
+    margin: 0;
+    font-weight: 400; 
+    color: var(--text-color);
+}
+
+/* Style the visible checkbox input */
+.checkbox-option input[type="checkbox"] {
+    position: static;
+    opacity: 1;
+    width: 16px;
+    height: 16px;
+}
+
+
+/* Hide default radio inputs */
+.radio-option input[type="radio"] {
     opacity: 0;
     position: absolute;
     width: 0;
@@ -117,30 +142,33 @@ button[type="submit"]:hover, #download-csv-button:hover {
 }
 
 /* Style the label wrapper as the visible button */
-.radio-option label, .checkbox-option label {
-    display: block;
+.radio-option {
+    display: block; 
     padding: 12px 15px;
-    border: 2px solid var(--border-color);
+    /* MODIFIED: Clear 1px border around all options */
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     cursor: pointer;
     text-align: center;
-    font-weight: normal;
+    font-weight: 400;
     transition: all 0.2s;
 }
 
+/* Hover State */
+.radio-option:hover {
+    background-color: #f0f0f0;
+    border-color: var(--accent-color);
+}
+
 /* Checked/Selected State */
-.radio-option input[type="radio"]:checked + label,
-.checkbox-option input[type="checkbox"]:checked + label {
+.radio-option input[type="radio"]:checked + input[type="radio"], 
+.radio-option input[type="radio"]:checked ~ span,
+.radio-option:has(input[type="radio"]:checked) {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(26, 77, 140, 0.3);
-}
-
-/* Hover State */
-.radio-option label:hover, .checkbox-option label:hover {
-    background-color: #f0f0f0;
-    border-color: var(--accent-color);
+    /* MODIFIED: Stronger visual highlight with a 2px colored border and subtle lift */
+    box-shadow: 0 0 0 2px var(--primary-color), 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
 
@@ -153,8 +181,8 @@ button[type="submit"]:hover, #download-csv-button:hover {
 
 .match-result {
     /* Modern card look for results */
-    background-color: #e9f5ff; /* Very light blue background */
-    border-left: 5px solid var(--primary-color); /* Accent stripe */
+    background-color: #e9f5ff; 
+    border-left: 5px solid var(--primary-color); 
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
