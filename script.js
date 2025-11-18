@@ -11,51 +11,10 @@ function getRadioValue(name) {
     return element ? element.value : null;
 }
 
-// Fetch and load the data when the script starts
-fetch('housing_data.json')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        HOUSING_DATA = data;
-        // Attach the event listener to the form AFTER the data has loaded
-        document.getElementById('housing-survey').addEventListener('submit', runSurvey);
-        // NEW FIX: Initial call to hide sections on page load
-        showBranchingSections(); 
-    })
-    .catch(error => {
-        console.error("Could not load housing data:", error);
-        document.getElementById('results-container').innerHTML = 
-            '<h2>Error: Could not load housing data. Check the file path.</h2>';
-    });
+// --- BRANCHING LOGIC ---
 
-// --- HELPER FUNCTIONS ---
-
-function parseBedroomRange(bedroomStr) {
-    if (typeof bedroomStr === 'number' || typeof bedroomStr === 'number') {
-        const val = parseInt(bedroomStr);
-        return [val, val];
-    }
-    const s = String(bedroomStr).trim();
-    if (s.includes('-')) {
-        const parts = s.split('-');
-        return [parseInt(parts[0]), parseInt(parts[1])];
-    }
-    try {
-        const val = parseInt(s);
-        return [val, val];
-    } catch {
-        return [0, 10];
-    }
-}
-
-// --- BRANCHING LOGIC (FIXED) ---
-
+// This function is called by the 'onclick' event in index.html
 function showBranchingSections() {
-    // Current housing is now a radio button group
     const status = getRadioValue('current_housing'); 
     
     // Hide all sections first
@@ -73,20 +32,59 @@ function showBranchingSections() {
     }
 }
 
-// --- SCORING LOGIC (No changes needed) ---
+// Fetch and load the data when the script starts
+fetch('housing_data.json')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        HOUSING_DATA = data;
+        // Attach the event listener to the form AFTER the data has loaded
+        document.getElementById('housing-survey').addEventListener('submit', runSurvey);
+        // Initial call to hide sections on page load
+        showBranchingSections(); 
+    })
+    .catch(error => {
+        console.error("Could not load housing data:", error);
+        document.getElementById('results-container').innerHTML = 
+            `<h2>Error: Could not load housing data. Check if 'housing_data.json' is in the same folder.</h2>`;
+    });
+
+// -----------------------------------------------------
+// --- SCORING, MATCHING, AND FORM DATA COLLECTION ---
+// -----------------------------------------------------
+
+function parseBedroomRange(bedroomStr) {
+    if (typeof bedroomStr === 'number') {
+        const val = parseInt(bedroomStr);
+        return [val, val];
+    }
+    const s = String(bedroomStr).trim();
+    if (s.includes('-')) {
+        const parts = s.split('-');
+        return [parseInt(parts[0]), parseInt(parts[1])];
+    }
+    try {
+        const val = parseInt(s);
+        return [val, val];
+    } catch {
+        return [0, 10];
+    }
+}
 
 function scoreAgency(agency, answers) {
     let score = 0;
     let reasons = [];
 
-    // Pull fields with safe defaults
     const minRent = agency.Min_Rent || 0;
     const maxRent = agency.Max_Rent || 1000000;
     const petFriendly = String(agency.Pet_Friendly).toLowerCase() === "yes";
     const [minBeds, maxBeds] = parseBedroomRange(agency.Bedrooms || "0-10");
     const matchTags = (agency.Match_Tags || []).map(t => t.toLowerCase());
 
-    // User Answers
     const monthlyIncome = answers.total_income; 
     const pets = answers.pets;
     const bedroomPref = answers.bedrooms;
@@ -94,7 +92,7 @@ function scoreAgency(agency, answers) {
     const currentHousing = answers.current_housing;
     const needsAccessible = answers.needs_accessible;
 
-    // 1. Affordability (~1/3 income to rent)
+    // 1. Affordability
     if (monthlyIncome > 0) {
         const budgetMax = monthlyIncome / 3;
         if (minRent <= budgetMax) {
@@ -113,9 +111,6 @@ function scoreAgency(agency, answers) {
     if (minBeds <= bedroomPref && bedroomPref <= maxBeds) {
         score += 3;
         reasons.push(`Offers your preferred ${bedroomPref} bedroom(s).`);
-    } else if (bedroomPref === maxBeds + 1 || bedroomPref === minBeds - 1) {
-        score += 1;
-        reasons.push("Bedroom count is close to what you want.");
     } else {
         score -= 1;
         reasons.push("Bedroom count may not fit your preference.");
@@ -130,12 +125,9 @@ function scoreAgency(agency, answers) {
             score -= 6;
             reasons.push("May not allow pets.");
         }
-    } else {
-        score += 1;
-        reasons.push("No pets (usually easier approvals).");
     }
 
-    // 4. Family-friendly tag if they have dependents
+    // 4. Family-friendly tag
     if (dependents > 0 && matchTags.includes("family-friendly")) {
         score += 2;
         reasons.push("Flagged as family-friendly.");
@@ -162,11 +154,6 @@ function scoreAgency(agency, answers) {
             score += 3;
             reasons.push("Tagged as voucher-friendly.");
         }
-    } else if (currentHousing === "At risk of losing housing") {
-        if (minRent <= 1300) {
-            score += 1;
-            reasons.push("Mid-range rent may help stabilize housing.");
-        }
     }
 
     return { score, reasons };
@@ -178,16 +165,11 @@ function matchTopAgencies(allData, answers, topN = 3) {
         return { score, agency, reasons };
     });
     
-    scored.sort((a, b) => b.score - a.score); // Sort by score, highest first
+    scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, topN);
 }
 
-// --- FORM HANDLER (UPDATED to use getRadioValue) ---
-
 function getFormAnswers() {
-    // Collects all user answers from the HTML form
-    
-    // Core Questions (now using getRadioValue)
     const baseIncome = parseInt(getRadioValue('income'));
     const partnerIncome = parseInt(getRadioValue('partner_income'));
     const currentHousing = getRadioValue('current_housing');
@@ -196,13 +178,11 @@ function getFormAnswers() {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
         total_income: baseIncome + partnerIncome,
-        // The getRadioValue function returns strings, so parse them to numbers where necessary.
         bedrooms: parseInt(getRadioValue('bedrooms')),
         dependents: parseInt(getRadioValue('dependents')),
         pets: parseInt(getRadioValue('pets')),
         needs_accessible: getRadioValue('needs_accessible'),
         current_housing: currentHousing,
-        // Checkboxes remain the same
         eviction: document.getElementById('eviction').checked, 
         criminal_record: document.getElementById('criminal_record').checked,
         needs_transit: document.getElementById('needs_transit').checked,
@@ -210,39 +190,45 @@ function getFormAnswers() {
 
     // --- ADD BRANCHED ANSWERS ---
     if (currentHousing === "Currently unhoused") {
-        answers.unhoused_description = document.getElementById('unhoused_desc').value;
-        answers.unhoused_how_long = getRadioValue('unhoused_how_long');
-        answers.unhoused_where = getRadioValue('unhoused_where');
-        answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
+        // Only collect values if the section is visible
+        if (document.getElementById('unhoused-section').style.display === 'block') {
+            answers.unhoused_description = document.getElementById('unhoused_desc').value;
+            answers.unhoused_how_long = getRadioValue('unhoused_how_long');
+            answers.unhoused_where = getRadioValue('unhoused_where');
+            answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
+        }
     } else if (currentHousing === "At risk of losing housing") {
-        answers.risk_description = document.getElementById('risk_desc').value;
-        answers.risk_lease_in_name = getRadioValue('risk_lease_in_name') === 'true';
-        answers.risk_eviction_notice = getRadioValue('risk_eviction_notice') === 'true';
-        answers.risk_behind_bills = getRadioValue('risk_behind_bills') === 'true';
-        answers.risk_want_to_stay = getRadioValue('risk_want_to_stay') === 'true';
-        answers.risk_lease_length = getRadioValue('risk_lease_length');
+         if (document.getElementById('at-risk-section').style.display === 'block') {
+            answers.risk_description = document.getElementById('risk_desc').value;
+            answers.risk_lease_in_name = getRadioValue('risk_lease_in_name') === 'true';
+            answers.risk_eviction_notice = getRadioValue('risk_eviction_notice') === 'true';
+            answers.risk_behind_bills = getRadioValue('risk_behind_bills') === 'true';
+            answers.risk_want_to_stay = getRadioValue('risk_want_to_stay') === 'true';
+            answers.risk_lease_length = getRadioValue('risk_lease_length');
+        }
     } else if (currentHousing === "Staying with friends or family") {
-        answers.family_description = document.getElementById('family_desc').value;
-        answers.family_stay_length = getRadioValue('family_stay_length');
-        answers.family_contribute = getRadioValue('family_contribute') === 'true';
-        answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
-        answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
+        if (document.getElementById('family-section').style.display === 'block') {
+            answers.family_description = document.getElementById('family_desc').value;
+            answers.family_stay_length = getRadioValue('family_stay_length');
+            answers.family_contribute = getRadioValue('family_contribute') === 'true';
+            answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
+            answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
+        }
     }
-    // --- END BRANCHED ANSWERS ---
-
     return answers;
 }
 
-// --- CSV DOWNLOAD TRIGGER ---
+// -----------------------------------------------------
+// --- CSV DOWNLOAD AND DISPLAY ---
+// -----------------------------------------------------
+
 function triggerCSVDownload() {
     if (LAST_ANSWERS && LAST_MATCHES) {
         saveResultsAsCSV(LAST_ANSWERS, LAST_MATCHES);
     } else {
-        alert("Error: Results data not available for download.");
+        alert("Error: Results data not available for download. Please run the match first.");
     }
 }
-
-// --- DISPLAY RESULTS (Updated to include button) ---
 
 function displayResults(matches) {
     const resultsDiv = document.getElementById('results-container');
@@ -275,24 +261,17 @@ function displayResults(matches) {
     document.getElementById('download-csv-button').onclick = triggerCSVDownload;
 }
 
-
-// --- CSV DOWNLOAD LOGIC ---
-
 function saveResultsAsCSV(answers, topMatches) {
-    // 1. Create the filename
     const name = answers.name.trim().replace(/\s+/g, '_'); 
     const email = answers.email.trim();
     const filename = `${name}_${email}.csv`.replace(/@/g, '_at_').replace(/\./g, '_dot_'); 
 
-    // 2. Build the CSV content
     let csvContent = "data:text/csv;charset=utf-8,";
     
-    // Header section
     csvContent += "User Information\n";
     csvContent += `"Name", "${answers.name}"\n`;
     csvContent += `"Email", "${answers.email}"\n\n`;
 
-    // Answers section
     csvContent += "Survey Answers\n";
     const excludedKeys = ['name', 'email']; 
     for (const key in answers) {
@@ -301,14 +280,12 @@ function saveResultsAsCSV(answers, topMatches) {
             if (typeof value === 'boolean') {
                 value = value ? 'Yes' : 'No';
             }
-            // Escape quotes within content for CSV safety
             const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
             csvContent += `"${key}", ${escape(value)}\n`;
         }
     }
     csvContent += "\n";
 
-    // Matches section
     csvContent += "Top 3 Housing Matches\n";
     csvContent += "Rank,Organization,Score,Phone,Address,Rent Range,Bedrooms,Pet Friendly,Why it matched\n";
 
@@ -316,7 +293,6 @@ function saveResultsAsCSV(answers, topMatches) {
         const agency = match.agency;
         const reasons = match.reasons.join("; "); 
         
-        // Escape quotes within content for CSV safety
         const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
 
         const row = [
@@ -333,7 +309,7 @@ function saveResultsAsCSV(answers, topMatches) {
         csvContent += row.join(",") + "\n";
     });
 
-    // 3. Trigger Download
+    // Trigger Download
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -345,14 +321,14 @@ function saveResultsAsCSV(answers, topMatches) {
 }
 
 
-// --- MAIN FUNCTION (Updated to store results) ---
+// --- MAIN FUNCTION ---
 
 function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
     
     // Check if required radio buttons are selected
-    if (!getRadioValue('income') || !getRadioValue('partner_income') || !getRadioValue('bedrooms')) {
-        alert("Please answer all required questions.");
+    if (!getRadioValue('income') || !getRadioValue('partner_income') || !getRadioValue('bedrooms') || !getRadioValue('dependents') || !getRadioValue('pets') || !getRadioValue('needs_accessible') || !getRadioValue('current_housing')) {
+        alert("Please answer all required core questions.");
         return;
     }
 
@@ -365,3 +341,7 @@ function runSurvey(event) {
     
     // Display results (which now includes the download button)
     displayResults(topMatches);
+
+    // Scroll to results
+    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+}
