@@ -36,6 +36,7 @@ function showBranchingSections() {
 fetch('housing_data.json')
     .then(response => {
         if (!response.ok) {
+            // This is the source of your "Could not load housing data" error if the file path is wrong
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
@@ -53,9 +54,7 @@ fetch('housing_data.json')
             `<h2>Error: Could not load housing data. Check if 'housing_data.json' is in the same folder.</h2>`;
     });
 
-// -----------------------------------------------------
-// --- SCORING, MATCHING, AND FORM DATA COLLECTION ---
-// -----------------------------------------------------
+// --- SCORING AND MATCHING LOGIC ---
 
 function parseBedroomRange(bedroomStr) {
     if (typeof bedroomStr === 'number') {
@@ -169,6 +168,8 @@ function matchTopAgencies(allData, answers, topN = 3) {
     return scored.slice(0, topN);
 }
 
+// --- FORM DATA COLLECTION ---
+
 function getFormAnswers() {
     const baseIncome = parseInt(getRadioValue('income'));
     const partnerIncome = parseInt(getRadioValue('partner_income'));
@@ -218,9 +219,7 @@ function getFormAnswers() {
     return answers;
 }
 
-// -----------------------------------------------------
-// --- CSV DOWNLOAD AND DISPLAY ---
-// -----------------------------------------------------
+// --- CSV DOWNLOAD LOGIC ---
 
 function triggerCSVDownload() {
     if (LAST_ANSWERS && LAST_MATCHES) {
