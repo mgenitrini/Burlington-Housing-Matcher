@@ -29,13 +29,12 @@ h2 {
     font-size: 1.5em;
     font-weight: 600;
     margin-top: 0;
-    /* MODIFIED: Add spacing below the section title */
+    /* Spacing added below section title */
     margin-bottom: 15px; 
 }
 
 /* --- 2. FORM STRUCTURE (CARDS) --- */
 .form-group {
-    /* Replaces the old thin border with a modern card design */
     border: none;
     background-color: white;
     border-radius: 12px;
@@ -49,7 +48,7 @@ h2 {
 label {
     display: block;
     font-weight: 600;
-    /* MODIFIED: Increased margin to improve vertical spacing */
+    /* Increased margin for better separation, as requested */
     margin-top: 25px; 
     margin-bottom: 15px; 
     color: var(--primary-color); 
@@ -110,19 +109,39 @@ button[type="submit"]:hover, #download-csv-button:hover {
     min-width: 120px;
 }
 
-/* Ensure inline display for checkbox labels */
+/* Checkbox Style (Unified Look) */
 .checkbox-option {
     margin: 10px 0;
     display: flex;
     align-items: center;
     gap: 10px;
+    /* Added base padding/border/background to match the radio options look */
+    padding: 10px 15px; 
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* Style for text next to checkboxes */
+/* Checkbox Highlight */
+.checkbox-option:has(input[type="checkbox"]:checked) {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px var(--primary-color), 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure text color changes to white when checkbox is checked */
+.checkbox-option:has(input[type="checkbox"]:checked) label {
+    color: white !important;
+}
+
+/* Standard label style for checkbox text (re-setting spacing) */
 .checkbox-option label {
     margin: 0;
     font-weight: 400; 
     color: var(--text-color);
+    transition: color 0.2s;
 }
 
 /* Style the visible checkbox input */
@@ -148,8 +167,8 @@ button[type="submit"]:hover, #download-csv-button:hover {
 .radio-option {
     display: block; 
     padding: 12px 15px;
-    /* Clear 1px border around all options */
-    border: 1px solid var(--border-color);
+    /* CRITICAL FIX: Ensure the default border loads */
+    border: 1px solid var(--border-color) !important; 
     border-radius: 8px;
     cursor: pointer;
     text-align: center;
@@ -164,13 +183,11 @@ button[type="submit"]:hover, #download-csv-button:hover {
 }
 
 /* Checked/Selected State */
-.radio-option input[type="radio"]:checked + input[type="radio"], 
-.radio-option input[type="radio"]:checked ~ span,
+/* CRITICAL FIX: Simplified and enforced selector for checked radio buttons */
 .radio-option:has(input[type="radio"]:checked) {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    /* Stronger visual highlight with a 2px colored border and subtle lift */
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
     box-shadow: 0 0 0 2px var(--primary-color), 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
