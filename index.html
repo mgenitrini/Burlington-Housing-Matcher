@@ -83,13 +83,109 @@
             <div class="form-group">
                 <h2>Current Situation</h2>
                 <label for="current_housing">Current housing situation:</label>
-                <select id="current_housing" required>
-                    <option value="Staying with friends or family">Staying with friends or family</option>
-                    <option value="At risk of losing housing">At risk of losing housing</option>
+                <select id="current_housing" required onchange="showBranchingSections()">
+                    <option value="">Select...</option>
                     <option value="Currently unhoused">Currently unhoused</option>
+                    <option value="At risk of losing housing">At risk of losing housing</option>
+                    <option value="Staying with friends or family">Staying with friends or family</option>
                 </select>
             </div>
             
+            <div id="unhoused-section" class="form-group" style="display:none;">
+                <h2>Unhoused Section</h2>
+                <label for="unhoused_desc">If you want, briefly describe your situation (optional):</label>
+                <input type="text" id="unhoused_desc">
+                
+                <label for="unhoused_how_long">How long have you been without housing?</label>
+                <select id="unhoused_how_long">
+                    <option value="1">Under a year</option>
+                    <option value="2">Over a year</option>
+                    <option value="3">Over 5 years</option>
+                </select>
+                
+                <label for="unhoused_where">Where did you sleep last night?</label>
+                <select id="unhoused_where">
+                    <option value="Shelter">Shelter</option>
+                    <option value="Outside">Outside</option>
+                    <option value="Vehicle">Vehicle</option>
+                    <option value="Motel">Motel</option>
+                </select>
+
+                <label for="unhoused_case_manager">Are you working with a case manager?</label>
+                <select id="unhoused_case_manager">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+            </div>
+
+            <div id="at-risk-section" class="form-group" style="display:none;">
+                <h2>At Risk of Losing Housing Section</h2>
+                <label for="risk_desc">If you want, briefly describe your situation (optional):</label>
+                <input type="text" id="risk_desc">
+                
+                <label for="risk_lease_in_name">Is the lease in your name?</label>
+                <select id="risk_lease_in_name">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+
+                <label for="risk_eviction_notice">Have you received an eviction notice?</label>
+                <select id="risk_eviction_notice">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                
+                <label for="risk_behind_bills">Are you behind on rent and/or utilities?</label>
+                <select id="risk_behind_bills">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+
+                <label for="risk_want_to_stay">Do you want to stay at your place / make it work?</label>
+                <select id="risk_want_to_stay">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+
+                <label for="risk_lease_length">How long of a lease are you looking for?</label>
+                <select id="risk_lease_length">
+                    <option value="1">Over six months</option>
+                    <option value="2">Over a year</option>
+                    <option value="3">Either</option>
+                </select>
+            </div>
+            
+            <div id="family-section" class="form-group" style="display:none;">
+                <h2>Staying With Family or Friends Section</h2>
+                <label for="family_desc">If you want, briefly describe your situation (optional):</label>
+                <input type="text" id="family_desc">
+                
+                <label for="family_stay_length">How long can you afford to stay there?</label>
+                <select id="family_stay_length">
+                    <option value="1">1–3 weeks</option>
+                    <option value="2">2–5 months</option>
+                    <option value="3">1 year or longer</option>
+                </select>
+                
+                <label for="family_contribute">Do you contribute to rent, food or utilities?</label>
+                <select id="family_contribute">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+
+                <label for="family_on_lease">Are you on the lease?</label>
+                <select id="family_on_lease">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+
+                <label for="family_perm_plan">Do you have a plan for permanent housing?</label>
+                <select id="family_perm_plan">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <h2>Other Factors</h2>
                 <input type="checkbox" id="eviction">
