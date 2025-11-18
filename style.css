@@ -1,0 +1,183 @@
+/* --- 1. GLOBAL STYLES & TYPOGRAPHY --- */
+:root {
+    --primary-color: #1a4d8c; /* Deep Blue */
+    --primary-dark: #0d3261;
+    --accent-color: #007bff; /* Bright Blue */
+    --bg-color: #f4f7f9; /* Light Gray Background */
+    --text-color: #333;
+    --border-color: #ccc;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+h2 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 0;
+}
+
+/* --- 2. FORM STRUCTURE (CARDS) --- */
+.form-group {
+    /* Replaces the old thin border with a modern card design */
+    border: none;
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: var(--primary-color); /* Emphasize question labels */
+}
+
+/* --- 3. INPUTS & BUTTONS --- */
+
+/* Text/Email Inputs */
+input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus, input[type="email"]:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* Primary Button Styling */
+button[type="submit"], #download-csv-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 20px;
+}
+
+button[type="submit"]:hover, #download-csv-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+/* --- 4. RADIO & CHECKBOX GROUPS (Modern Look) --- */
+
+.radio-group, .checkbox-option {
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Style for individual radio/checkbox labels */
+.radio-option, .checkbox-option label {
+    flex: 1 1 auto; /* Allows options to grow/shrink but keep a base size */
+    min-width: 120px;
+}
+
+/* Hide default radio/checkbox inputs */
+.radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
+    /* Hide the actual input but keep it functional */
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the label wrapper as the visible button */
+.radio-option label, .checkbox-option label {
+    display: block;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: normal;
+    transition: all 0.2s;
+}
+
+/* Checked/Selected State */
+.radio-option input[type="radio"]:checked + label,
+.checkbox-option input[type="checkbox"]:checked + label {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(26, 77, 140, 0.3);
+}
+
+/* Hover State */
+.radio-option label:hover, .checkbox-option label:hover {
+    background-color: #f0f0f0;
+    border-color: var(--accent-color);
+}
+
+
+/* --- 5. RESULTS CONTAINER --- */
+
+#results-container {
+    margin-top: 40px;
+    padding-top: 20px;
+}
+
+.match-result {
+    /* Modern card look for results */
+    background-color: #e9f5ff; /* Very light blue background */
+    border-left: 5px solid var(--primary-color); /* Accent stripe */
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.match-result h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    border-bottom: 1px solid #cce0f0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.match-result p {
+    line-height: 1.4;
+    font-size: 0.95em;
+}
+
+.match-result ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    font-size: 0.9em;
+    color: #555;
+}
