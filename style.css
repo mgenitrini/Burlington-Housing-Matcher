@@ -29,6 +29,8 @@ h2 {
     font-size: 1.5em;
     font-weight: 600;
     margin-top: 0;
+    /* MODIFIED: Add spacing below the section title */
+    margin-bottom: 15px; 
 }
 
 /* --- 2. FORM STRUCTURE (CARDS) --- */
@@ -47,8 +49,9 @@ h2 {
 label {
     display: block;
     font-weight: 600;
-    margin-top: 15px;
-    margin-bottom: 5px;
+    /* MODIFIED: Increased margin to improve vertical spacing */
+    margin-top: 25px; 
+    margin-bottom: 15px; 
     color: var(--primary-color); 
 }
 
@@ -145,7 +148,7 @@ button[type="submit"]:hover, #download-csv-button:hover {
 .radio-option {
     display: block; 
     padding: 12px 15px;
-    /* MODIFIED: Clear 1px border around all options */
+    /* Clear 1px border around all options */
     border: 1px solid var(--border-color);
     border-radius: 8px;
     cursor: pointer;
@@ -167,7 +170,7 @@ button[type="submit"]:hover, #download-csv-button:hover {
     background-color: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-    /* MODIFIED: Stronger visual highlight with a 2px colored border and subtle lift */
+    /* Stronger visual highlight with a 2px colored border and subtle lift */
     box-shadow: 0 0 0 2px var(--primary-color), 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
