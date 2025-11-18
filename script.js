@@ -1,6 +1,6 @@
 // Variable to hold the loaded JSON data
 let HOUSING_DATA = [];
-// NEW: Global variables to store the last results for CSV download
+// Global variables to store the last results for CSV download
 let LAST_ANSWERS = null;
 let LAST_MATCHES = [];
 
@@ -23,7 +23,7 @@ fetch('housing_data.json')
         HOUSING_DATA = data;
         // Attach the event listener to the form AFTER the data has loaded
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
-        // Initial call to hide sections on page load
+        // NEW FIX: Initial call to hide sections on page load
         showBranchingSections(); 
     })
     .catch(error => {
@@ -52,7 +52,7 @@ function parseBedroomRange(bedroomStr) {
     }
 }
 
-// --- BRANCHING LOGIC ---
+// --- BRANCHING LOGIC (FIXED) ---
 
 function showBranchingSections() {
     // Current housing is now a radio button group
@@ -73,8 +73,7 @@ function showBranchingSections() {
     }
 }
 
-
-// --- SCORING LOGIC ---
+// --- SCORING LOGIC (No changes needed) ---
 
 function scoreAgency(agency, answers) {
     let score = 0;
@@ -197,6 +196,7 @@ function getFormAnswers() {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
         total_income: baseIncome + partnerIncome,
+        // The getRadioValue function returns strings, so parse them to numbers where necessary.
         bedrooms: parseInt(getRadioValue('bedrooms')),
         dependents: parseInt(getRadioValue('dependents')),
         pets: parseInt(getRadioValue('pets')),
@@ -233,7 +233,7 @@ function getFormAnswers() {
     return answers;
 }
 
-// --- NEW FUNCTION TO HANDLE BUTTON CLICK ---
+// --- CSV DOWNLOAD TRIGGER ---
 function triggerCSVDownload() {
     if (LAST_ANSWERS && LAST_MATCHES) {
         saveResultsAsCSV(LAST_ANSWERS, LAST_MATCHES);
@@ -242,7 +242,7 @@ function triggerCSVDownload() {
     }
 }
 
-// --- DISPLAY RESULTS (UPDATED to include the button) ---
+// --- DISPLAY RESULTS (Updated to include button) ---
 
 function displayResults(matches) {
     const resultsDiv = document.getElementById('results-container');
@@ -268,7 +268,7 @@ function displayResults(matches) {
         `;
     });
 
-    // NEW: Add the download button after the results
+    // Add the download button after the results
     resultsDiv.innerHTML += `<br><button id="download-csv-button">Download Results CSV</button>`;
     
     // Attach the function to the button
@@ -276,13 +276,12 @@ function displayResults(matches) {
 }
 
 
-// --- CSV DOWNLOAD LOGIC (UNCHANGED, still called by triggerCSVDownload) ---
+// --- CSV DOWNLOAD LOGIC ---
 
 function saveResultsAsCSV(answers, topMatches) {
-    // 1. Create the filename: "First_Last_mgenitrini_at_elon_dot_edu.csv"
-    const name = answers.name.trim().replace(/\s+/g, '_'); // Replaces spaces with underscores
+    // 1. Create the filename
+    const name = answers.name.trim().replace(/\s+/g, '_'); 
     const email = answers.email.trim();
-    // Sanitizes email for filename to avoid illegal characters
     const filename = `${name}_${email}.csv`.replace(/@/g, '_at_').replace(/\./g, '_dot_'); 
 
     // 2. Build the CSV content
@@ -302,7 +301,9 @@ function saveResultsAsCSV(answers, topMatches) {
             if (typeof value === 'boolean') {
                 value = value ? 'Yes' : 'No';
             }
-            csvContent += `"${key}", "${value}"\n`;
+            // Escape quotes within content for CSV safety
+            const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
+            csvContent += `"${key}", ${escape(value)}\n`;
         }
     }
     csvContent += "\n";
@@ -313,7 +314,7 @@ function saveResultsAsCSV(answers, topMatches) {
 
     topMatches.forEach((match, index) => {
         const agency = match.agency;
-        const reasons = match.reasons.join("; "); // Join reasons into a single string
+        const reasons = match.reasons.join("; "); 
         
         // Escape quotes within content for CSV safety
         const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
@@ -344,7 +345,7 @@ function saveResultsAsCSV(answers, topMatches) {
 }
 
 
-// --- MAIN FUNCTION (UPDATED to store results and skip automatic download) ---
+// --- MAIN FUNCTION (Updated to store results) ---
 
 function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
@@ -358,13 +359,9 @@ function runSurvey(event) {
     const answers = getFormAnswers();
     const topMatches = matchTopAgencies(HOUSING_DATA, answers, 3);
     
-    // NEW: Store results globally instead of downloading immediately
+    // Store results globally 
     LAST_ANSWERS = answers;
     LAST_MATCHES = topMatches;
     
     // Display results (which now includes the download button)
     displayResults(topMatches);
-
-    // Scroll to results
-    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
-}
