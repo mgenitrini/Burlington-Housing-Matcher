@@ -13,6 +13,8 @@ fetch('housing_data.json')
         HOUSING_DATA = data;
         // Attach the event listener to the form AFTER the data has loaded
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
+        // Initial call to hide sections on page load
+        showBranchingSections(); 
     })
     .catch(error => {
         console.error("Could not load housing data:", error);
@@ -41,7 +43,27 @@ function parseBedroomRange(bedroomStr) {
     }
 }
 
-// --- SCORING LOGIC TRANSLATED FROM Survey.py ---
+// --- BRANCHING LOGIC (New) ---
+function showBranchingSections() {
+    const status = document.getElementById('current_housing').value;
+    
+    // Hide all sections first
+    document.getElementById('unhoused-section').style.display = 'none';
+    document.getElementById('at-risk-section').style.display = 'none';
+    document.getElementById('family-section').style.display = 'none';
+    
+    // Show the relevant section
+    if (status === "Currently unhoused") {
+        document.getElementById('unhoused-section').style.display = 'block';
+    } else if (status === "At risk of losing housing") {
+        document.getElementById('at-risk-section').style.display = 'block';
+    } else if (status === "Staying with friends or family") {
+        document.getElementById('family-section').style.display = 'block';
+    }
+}
+
+
+// --- SCORING LOGIC TRANSLATED FROM Survey.py (Unchanged) ---
 
 function scoreAgency(agency, answers) {
     let score = 0;
@@ -150,34 +172,52 @@ function matchTopAgencies(allData, answers, topN = 3) {
     return scored.slice(0, topN);
 }
 
-// --- FORM HANDLER AND DISPLAY ---
+// --- FORM HANDLER AND DISPLAY (Updated to collect branched data) ---
 
 function getFormAnswers() {
     // Collects all user answers from the HTML form
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
     const baseIncome = parseInt(document.getElementById('income').value);
     const partnerIncome = parseInt(document.getElementById('partner_income').value);
-    const bedrooms = parseInt(document.getElementById('bedrooms').value);
-    const dependents = parseInt(document.getElementById('dependents').value);
-    const pets = parseInt(document.getElementById('pets').value);
-    const needsAccessible = document.getElementById('needs_accessible').value;
     const currentHousing = document.getElementById('current_housing').value;
-
-    return {
-        name,
-        email,
+    
+    const answers = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
         total_income: baseIncome + partnerIncome,
-        bedrooms,
-        dependents,
-        pets,
-        needs_accessible: needsAccessible,
+        bedrooms: parseInt(document.getElementById('bedrooms').value),
+        dependents: parseInt(document.getElementById('dependents').value),
+        pets: parseInt(document.getElementById('pets').value),
+        needs_accessible: document.getElementById('needs_accessible').value,
         current_housing: currentHousing,
-        // The checkboxes are not used in scoring yet, but included for context
+        // Checkboxes
         eviction: document.getElementById('eviction').checked, 
         criminal_record: document.getElementById('criminal_record').checked,
         needs_transit: document.getElementById('needs_transit').checked,
     };
+
+    // --- ADD BRANCHED ANSWERS ---
+    if (currentHousing === "Currently unhoused") {
+        answers.unhoused_description = document.getElementById('unhoused_desc').value;
+        answers.unhoused_how_long = document.getElementById('unhoused_how_long').value;
+        answers.unhoused_where = document.getElementById('unhoused_where').value;
+        answers.unhoused_case_manager = document.getElementById('unhoused_case_manager').value === 'true';
+    } else if (currentHousing === "At risk of losing housing") {
+        answers.risk_description = document.getElementById('risk_desc').value;
+        answers.risk_lease_in_name = document.getElementById('risk_lease_in_name').value === 'true';
+        answers.risk_eviction_notice = document.getElementById('risk_eviction_notice').value === 'true';
+        answers.risk_behind_bills = document.getElementById('risk_behind_bills').value === 'true';
+        answers.risk_want_to_stay = document.getElementById('risk_want_to_stay').value === 'true';
+        answers.risk_lease_length = document.getElementById('risk_lease_length').value;
+    } else if (currentHousing === "Staying with friends or family") {
+        answers.family_description = document.getElementById('family_desc').value;
+        answers.family_stay_length = document.getElementById('family_stay_length').value;
+        answers.family_contribute = document.getElementById('family_contribute').value === 'true';
+        answers.family_on_lease = document.getElementById('family_on_lease').value === 'true';
+        answers.family_perm_plan = document.getElementById('family_perm_plan').value === 'true';
+    }
+    // --- END BRANCHED ANSWERS ---
+
+    return answers;
 }
 
 function displayResults(matches) {
@@ -217,5 +257,3 @@ function runSurvey(event) {
     // Scroll to results
     document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 }
-
-// The event listener is attached in the fetch promise after data loads.
