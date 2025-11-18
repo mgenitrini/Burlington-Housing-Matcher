@@ -25,7 +25,6 @@ fetch('housing_data.json')
 // --- HELPER FUNCTIONS ---
 
 function parseBedroomRange(bedroomStr) {
-    // Logic translated from Survey.py's parse_bedroom_range function
     if (typeof bedroomStr === 'number' || typeof bedroomStr === 'number') {
         const val = parseInt(bedroomStr);
         return [val, val];
@@ -39,11 +38,12 @@ function parseBedroomRange(bedroomStr) {
         const val = parseInt(s);
         return [val, val];
     } catch {
-        return [0, 10]; // very loose default if data is messy
+        return [0, 10];
     }
 }
 
-// --- BRANCHING LOGIC (New) ---
+// --- BRANCHING LOGIC ---
+
 function showBranchingSections() {
     const status = document.getElementById('current_housing').value;
     
@@ -63,7 +63,7 @@ function showBranchingSections() {
 }
 
 
-// --- SCORING LOGIC TRANSLATED FROM Survey.py (Unchanged) ---
+// --- SCORING LOGIC ---
 
 function scoreAgency(agency, answers) {
     let score = 0;
@@ -142,7 +142,7 @@ function scoreAgency(agency, answers) {
         }
     }
     
-    // 6. Current housing situation
+    // 6. Current housing situation (scoring logic for branching is simplified here but can be expanded)
     if (currentHousing === "Currently unhoused") {
         if (minRent <= 1100) {
             score += 2;
@@ -172,7 +172,7 @@ function matchTopAgencies(allData, answers, topN = 3) {
     return scored.slice(0, topN);
 }
 
-// --- FORM HANDLER AND DISPLAY (Updated to collect branched data) ---
+// --- FORM HANDLER AND DISPLAY ---
 
 function getFormAnswers() {
     // Collects all user answers from the HTML form
@@ -246,6 +246,78 @@ function displayResults(matches) {
     });
 }
 
+
+// --- CSV DOWNLOAD LOGIC (New) ---
+
+function saveResultsAsCSV(answers, topMatches) {
+    // 1. Create the filename: "Michael_Genitrini_mgenitrini@elon.edu.csv"
+    const name = answers.name.trim().replace(/\s+/g, '_'); // Replaces spaces with underscores
+    const email = answers.email.trim();
+    const filename = `${name}_${email}.csv`.replace(/@/g, '_at_').replace(/\./g, '_dot_'); // Sanitizes email for filename
+
+    // 2. Build the CSV content
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    // Header section
+    csvContent += "User Information\n";
+    csvContent += `"Name", "${answers.name}"\n`;
+    csvContent += `"Email", "${answers.email}"\n\n`;
+
+    // Answers section
+    csvContent += "Survey Answers\n";
+    // Exclude name and email, which are already at the top
+    const excludedKeys = ['name', 'email']; 
+    for (const key in answers) {
+        if (answers.hasOwnProperty(key) && !excludedKeys.includes(key)) {
+            // Simple stringify (handles boolean/numbers correctly)
+            let value = answers[key];
+            if (typeof value === 'boolean') {
+                value = value ? 'Yes' : 'No';
+            }
+            csvContent += `"${key}", "${value}"\n`;
+        }
+    }
+    csvContent += "\n";
+
+    // Matches section
+    csvContent += "Top 3 Housing Matches\n";
+    csvContent += "Rank,Organization,Score,Phone,Address,Rent Range,Bedrooms,Pet Friendly,Why it matched\n";
+
+    topMatches.forEach((match, index) => {
+        const agency = match.agency;
+        const reasons = match.reasons.join("; "); // Join reasons into a single string
+        
+        // Escape quotes within content for CSV safety
+        const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
+
+        const row = [
+            index + 1,
+            escape(agency.Organization),
+            match.score,
+            escape(agency.Phone || 'N/A'),
+            escape(agency.Address || 'N/A'),
+            escape(`$${agency.Min_Rent} – $${agency.Max_Rent}`),
+            escape(agency.Bedrooms),
+            escape(agency.Pet_Friendly || 'Unknown'),
+            escape(reasons)
+        ];
+        csvContent += row.join(",") + "\n";
+    });
+
+    // 3. Trigger Download
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    console.log(`Saved results to CSV file: ${filename}`);
+}
+
+
+// --- MAIN FUNCTION ---
+
 function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
     
@@ -253,6 +325,9 @@ function runSurvey(event) {
     const topMatches = matchTopAgencies(HOUSING_DATA, answers, 3);
     
     displayResults(topMatches);
+    
+    // NEW: Save the results to CSV and trigger download
+    saveResultsAsCSV(answers, topMatches);
 
     // Scroll to results
     document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
