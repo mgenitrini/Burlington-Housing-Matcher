@@ -3,16 +3,14 @@ let HOUSING_DATA = [];
 
 // --- HELPER FUNCTIONS ---
 
-// NEW: Function to get the checked value of a radio group by its name attribute
+// Function to get the checked value of a radio group by its name attribute
 function getRadioValue(name) {
     const selector = `input[name="${name}"]:checked`;
     const element = document.querySelector(selector);
-    // If an element is found, return its value; otherwise, return null
     return element ? element.value : null; 
 }
 
 function parseBedroomRange(bedroomStr) {
-    // Logic translated from Survey.py's parse_bedroom_range function
     if (typeof bedroomStr === 'number' || typeof bedroomStr === 'number') {
         const val = parseInt(bedroomStr);
         return [val, val];
@@ -26,20 +24,18 @@ function parseBedroomRange(bedroomStr) {
         const val = parseInt(s);
         return [val, val];
     } catch {
-        return [0, 10]; // very loose default if data is messy
+        return [0, 10]; 
     }
 }
 
-// --- CSV LOGIC (Restored and Improved) ---
+// --- CSV LOGIC ---
 
 function arrayToCsv(data) {
-    // Create header row from keys of the first object
     const header = Object.keys(data[0]).join(',');
     
-    // Convert object values to CSV rows, ensuring values with commas/quotes are handled correctly
     const rows = data.map(obj => 
         Object.values(obj).map(val => 
-            `"${String(val).replace(/"/g, '""')}"` // Quote and escape values
+            `"${String(val).replace(/"/g, '""')}"`
         ).join(',')
     );
     return [header, ...rows].join('\n');
@@ -57,7 +53,6 @@ function generateCSV(matches, answers) {
             Rent_Range: `$${match.agency.Min_Rent} - $${match.agency.Max_Rent}`,
             Bedrooms_Offered: match.agency.Bedrooms,
             Match_Reasons: match.reasons.join('; '),
-            // Adding User Answers for context
             User_Name: answers.name,
             User_Email: answers.email,
             User_Total_Income: answers.total_income,
@@ -71,7 +66,6 @@ function generateCSV(matches, answers) {
     const csvContent = arrayToCsv(dataRows);
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     
-    // Create and click a hidden link to trigger the download
     const link = document.createElement("a");
     if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
@@ -85,20 +79,18 @@ function generateCSV(matches, answers) {
 }
 
 
-// --- SCORING LOGIC TRANSLATED FROM Survey.py ---
+// --- SCORING LOGIC ---
 
 function scoreAgency(agency, answers) {
     let score = 0;
     let reasons = [];
 
-    // Pull fields with safe defaults
     const minRent = agency.Min_Rent || 0;
     const maxRent = agency.Max_Rent || 1000000;
     const petFriendly = String(agency.Pet_Friendly).toLowerCase() === "yes";
     const [minBeds, maxBeds] = parseBedroomRange(agency.Bedrooms || "0-10");
     const matchTags = (agency.Match_Tags || []).map(t => t.toLowerCase());
 
-    // User Answers
     const monthlyIncome = answers.total_income; 
     const pets = answers.pets;
     const bedroomPref = answers.bedrooms;
@@ -106,7 +98,7 @@ function scoreAgency(agency, answers) {
     const currentHousing = answers.current_housing;
     const needsAccessible = answers.needs_accessible;
 
-    // 1. Affordability (~1/3 income to rent)
+    // 1. Affordability
     if (monthlyIncome > 0) {
         const budgetMax = monthlyIncome / 3;
         if (minRent <= budgetMax) {
@@ -190,11 +182,39 @@ function matchTopAgencies(allData, answers, topN = 3) {
         return { score, agency, reasons };
     });
     
-    scored.sort((a, b) => b.score - a.score); // Sort by score, highest first
+    scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, topN);
 }
 
 // --- FORM HANDLER AND DISPLAY ---
+
+/**
+ * NEW FUNCTION: Handles showing and hiding the conditional sections 
+ * when a user selects a "Current housing situation" radio button.
+ */
+function showBranchingSections() {
+    const unhousedDiv = document.getElementById('unhoused-section');
+    const atRiskDiv = document.getElementById('at-risk-section');
+    const familyDiv = document.getElementById('family-section');
+    
+    // Use getRadioValue to find which current_housing option is checked
+    const selectedHousing = getRadioValue('current_housing'); 
+
+    // Hide all sections initially
+    unhousedDiv.style.display = 'none';
+    atRiskDiv.style.display = 'none';
+    familyDiv.style.display = 'none';
+
+    // Show only the relevant section
+    if (selectedHousing === 'Currently unhoused') {
+        unhousedDiv.style.display = 'block';
+    } else if (selectedHousing === 'At risk of losing housing') {
+        atRiskDiv.style.display = 'block';
+    } else if (selectedHousing === 'Staying with friends or family') {
+        familyDiv.style.display = 'block';
+    }
+}
+
 
 function getFormAnswers() {
     // Text inputs still use getElementById
@@ -203,7 +223,6 @@ function getFormAnswers() {
     
     // Radio buttons now use the custom getRadioValue function and name attribute
     const baseIncome = parseInt(getRadioValue('income'));
-    // Use || 0 to ensure partnerIncome doesn't break math if left null
     const partnerIncome = parseInt(getRadioValue('partner_income') || 0); 
     const bedrooms = parseInt(getRadioValue('bedrooms'));
     const dependents = parseInt(getRadioValue('dependents'));
@@ -266,11 +285,11 @@ function displayResults(matches, answers) {
 }
 
 function runSurvey(event) {
-    event.preventDefault(); // Stop the form from submitting normally
+    event.preventDefault(); 
     
     const answers = getFormAnswers();
 
-    // CRITICAL VALIDATION CHECK: Check ALL required fields (numeric and string)
+    // CRITICAL VALIDATION CHECK: Check ALL required fields
     const requiredNumericFields = [
         answers.total_income,
         answers.bedrooms,
