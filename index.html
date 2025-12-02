@@ -30,12 +30,39 @@
             <div class="form-group">
                 <h2>Core Needs</h2>
                 
-                <label for="income-slider">Monthly Household Income:</label>
-                <div class="income-slider-group" style="margin-bottom: 20px;">
-                    <input type="range" id="income-slider" name="income" min="0" max="7500" step="100" value="1500" required>
-                    <p>Current Income: <span id="income-display">$1,500</span></p>
+                <label>Monthly income:</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="1250" required> <span>In between 1,000–1,500</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="1750"> <span>In between 1,500–2,000</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="2500"> <span>Over 2,000</span>
+                    </label>
                 </div>
-                <label>Preferred Number of Bedrooms:</label>
+                
+                <label>Partner's monthly income (if applicable):</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="partner_income" value="0" required> <span>I do not combine income</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="partner_income" value="750"> <span>Under 1,000</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="partner_income" value="1250"> <span>1,000–1,500</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="partner_income" value="1750"> <span>1,500–2,000</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="partner_income" value="2500"> <span>Over 2,000</span>
+                    </label>
+                </div>
+
+                <label>Bedroom amount preference:</label>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="bedrooms" value="1" required> <span>1</span>
@@ -51,94 +78,47 @@
                     </label>
                 </div>
 
-                <label>How Many Adults Will Be Living in this Apartment?</label>
+                <label>Do you have dependents? If so, how many?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="adults" value="1" required> <span>1</span>
+                        <input type="radio" name="dependents" value="0" required> <span>0</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="adults" value="2"> <span>2</span>
+                        <input type="radio" name="dependents" value="1"> <span>1</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="adults" value="3"> <span>3</span>
+                        <input type="radio" name="dependents" value="2"> <span>2</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="adults" value="4"> <span>4+</span>
+                        <input type="radio" name="dependents" value="3"> <span>3+</span>
                     </label>
                 </div>
 
-                <label>How Many Kids Do You Have?</label>
+                <label>Pet situation:</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="kids" value="0" required> <span>0</span>
+                        <input type="radio" name="pets" value="0" required> <span>No pets</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="kids" value="1"> <span>1</span>
+                        <input type="radio" name="pets" value="1"> <span>1 pet</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="kids" value="2"> <span>2</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="kids" value="3"> <span>3</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="kids" value="4"> <span>4+</span>
-                    </label>
-                </div>
-
-                <label>Do You Have Pets?</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="pets" value="Yes" onclick="showPetSections()"> <span>Yes</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="pets" value="No" required onclick="showPetSections()"> <span>No</span>
+                        <input type="radio" name="pets" value="2"> <span>2+ pets</span>
                     </label>
                 </div>
                 
-                <div id="pet-details-section" class="form-group" style="display:none; padding: 20px 20px 5px 20px; border: 1px dashed #2e86de;">
-                    <h2>Pet Details</h2>
-                    
-                    <label>Is Your Pet Over 25 lbs?</label>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="pet_weight" value="Yes"> <span>Yes</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="pet_weight" value="No"> <span>No</span>
-                        </label>
-                    </div>
-
-                    <label>Is Your Pet a Restricted Breed?</label>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="restricted_breed" value="Yes" onclick="showBreedField()"> <span>Yes</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="restricted_breed" value="No" onclick="showBreedField()"> <span>No</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="restricted_breed" value="I don't know" onclick="showBreedField()"> <span>I don't know</span>
-                        </label>
-                    </div>
-
-                    <div id="breed-field-section" style="display:none; margin-top: 15px;">
-                        <label for="breed_description">What Breed is Your Pet?</label>
-                        <input type="text" id="breed_description" placeholder="e.g., Terrier mix, Labrador">
-                    </div>
-
-                </div>
-                
-                <label>Do You Need Accessibility Accommodations? (first floor, ramps, elevators, parking, etc.)</label>
+                <label>Do you need disability accessible housing?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="Yes"> <span>Yes</span>
+                        <input type="radio" name="needs_accessible" value="false" required> <span>No, I do not</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="No" required> <span>No</span>
+                        <input type="radio" name="needs_accessible" value="semi"> <span>Not fully accessible</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="needs_accessible" value="true"> <span>Yes, fully accessible</span>
                     </label>
                 </div>
-
             </div>
 
             <div class="form-group">
@@ -146,13 +126,29 @@
                 <label>Current housing situation:</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="current_housing" value="Currently unhoused" required onclick="showBranchingSections()"> <span>Currently unhoused</span>
+                        <input type="radio" name="current_housing" value="I have my own place" required onclick="showBranchingSections()"> <span>I have my own place</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="current_housing" value="Currently unhoused" onclick="showBranchingSections()"> <span>Currently Unhoused (Couch Surfing/Sleeping in a Car/Sleeping Outside)</span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="current_housing" value="At risk of losing housing" onclick="showBranchingSections()"> <span>At risk of losing housing</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="current_housing" value="Staying with friends or family" onclick="showBranchingSections()"> <span>Staying with friends or family</span>
+                        <input type="radio" name="current_housing" value="Staying with friends or family" onclick="showBranchingSections()"> <span>Living with friends or family</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="own-place-section" class="form-group" style="display:none;">
+                <h2>I Have My Own Place Section</h2>
+                <label>Are you behind on rent or utilities?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="own_place_behind_bills" value="true"> <span>Yes</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="own_place_behind_bills" value="false"> <span>No</span>
                     </label>
                 </div>
             </div>
@@ -190,14 +186,14 @@
                         <input type="radio" name="unhoused_where" value="Motel"> <span>Motel</span>
                     </label>
                 </div>
-
+                
                 <label>Are you working with a case manager?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="unhoused_case_manager" value="true"> <span>Yes</span>
+                        <input type="radio" name="unhoused_case_manager" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="unhoused_case_manager" value="false"> <span>No</span>
+                        <input type="radio" name="unhoused_case_manager" value="true"> <span>Yes</span>
                     </label>
                 </div>
             </div>
@@ -210,40 +206,40 @@
                 <label>Is the lease in your name?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="risk_lease_in_name" value="true"> <span>Yes</span>
+                        <input type="radio" name="risk_lease_in_name" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="risk_lease_in_name" value="false"> <span>No</span>
+                        <input type="radio" name="risk_lease_in_name" value="true"> <span>Yes</span>
                     </label>
                 </div>
 
                 <label>Have you received an eviction notice?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="risk_eviction_notice" value="true"> <span>Yes</span>
+                        <input type="radio" name="risk_eviction_notice" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="risk_eviction_notice" value="false"> <span>No</span>
+                        <input type="radio" name="risk_eviction_notice" value="true"> <span>Yes</span>
                     </label>
                 </div>
                 
                 <label>Are you behind on rent and/or utilities?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="risk_behind_bills" value="true"> <span>Yes</span>
+                        <input type="radio" name="risk_behind_bills" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="risk_behind_bills" value="false"> <span>No</span>
+                        <input type="radio" name="risk_behind_bills" value="true"> <span>Yes</span>
                     </label>
                 </div>
 
                 <label>Do you want to stay at your place / make it work?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="risk_want_to_stay" value="true"> <span>Yes</span>
+                        <input type="radio" name="risk_want_to_stay" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="risk_want_to_stay" value="false"> <span>No</span>
+                        <input type="radio" name="risk_want_to_stay" value="true"> <span>Yes</span>
                     </label>
                 </div>
 
@@ -282,30 +278,30 @@
                 <label>Do you contribute to rent, food or utilities?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="family_contribute" value="true"> <span>Yes</span>
+                        <input type="radio" name="family_contribute" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="family_contribute" value="false"> <span>No</span>
+                        <input type="radio" name="family_contribute" value="true"> <span>Yes</span>
                     </label>
                 </div>
 
                 <label>Are you on the lease?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="family_on_lease" value="true"> <span>Yes</span>
+                        <input type="radio" name="family_on_lease" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="family_on_lease" value="false"> <span>No</span>
+                        <input type="radio" name="family_on_lease" value="true"> <span>Yes</span>
                     </label>
                 </div>
 
                 <label>Do you have a plan for permanent housing?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="family_perm_plan" value="true"> <span>Yes</span>
+                        <input type="radio" name="family_perm_plan" value="false"> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="family_perm_plan" value="false"> <span>No</span>
+                        <input type="radio" name="family_perm_plan" value="true"> <span>Yes</span>
                     </label>
                 </div>
             </div>
