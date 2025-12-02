@@ -59,7 +59,7 @@ function showPetSections() {
 }
 
 
-// This function is called by the 'onclick' event in index.html for current housing
+// UPDATED: Handles new order and new "Own place" section
 function showBranchingSections() {
     const status = getRadioValue('current_housing'); 
     
@@ -67,14 +67,18 @@ function showBranchingSections() {
     document.getElementById('unhoused-section').style.display = 'none';
     document.getElementById('at-risk-section').style.display = 'none';
     document.getElementById('family-section').style.display = 'none';
+    document.getElementById('own-place-section').style.display = 'none'; // New Section
+
     
-    // Show the relevant section
+    // Show the relevant section based on the new order
     if (status === "Currently unhoused") {
         document.getElementById('unhoused-section').style.display = 'block';
+    } else if (status === "Staying with friends or family") { // Value remains "Staying with friends or family" in script to match old input
+        document.getElementById('family-section').style.display = 'block';
     } else if (status === "At risk of losing housing") {
         document.getElementById('at-risk-section').style.display = 'block';
-    } else if (status === "Staying with friends or family") {
-        document.getElementById('family-section').style.display = 'block';
+    } else if (status === "Own place") { // New value "Own place"
+        document.getElementById('own-place-section').style.display = 'block';
     }
 }
 
@@ -82,7 +86,6 @@ function showBranchingSections() {
 fetch('housing_data.json')
     .then(response => {
         if (!response.ok) {
-            // This error check is critical for debugging data loading!
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
@@ -92,7 +95,7 @@ fetch('housing_data.json')
         // Attach the form submission listener
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
         
-        // --- SLIDER LISTENER ATTACHMENT (FIX for stuck slider display) ---
+        // --- SLIDER LISTENER ATTACHMENT ---
         const incomeSlider = document.getElementById('income-slider');
         
         // Attach the update function to the 'input' event to make it drag-responsive
@@ -113,7 +116,7 @@ fetch('housing_data.json')
             `<h2>Error: Could not load housing data. Check if 'housing_data.json' is in the same folder.</h2>`;
     });
 
-// --- SCORING AND MATCHING LOGIC (The core of your application) ---
+// --- SCORING AND MATCHING LOGIC (Keep for functionality) ---
 
 function parseBedroomRange(bedroomStr) {
     if (typeof bedroomStr === 'number') {
@@ -210,11 +213,11 @@ function scoreAgency(agency, answers) {
         }
     }
     
-    // 6. Current housing situation
-    if (currentHousing === "Currently unhoused") {
+    // 6. Current housing situation (Simple score for unhoused/at-risk remains)
+    if (currentHousing === "Currently unhoused" || currentHousing === "At risk of losing housing") {
         if (minRent <= 1100) {
             score += 2;
-            reasons.push("Lower starting rent, possibly more reachable for unhoused status.");
+            reasons.push("Lower starting rent, possibly more reachable for current situation.");
         }
         if (matchTags.includes("voucher-friendly")) {
             score += 3;
@@ -281,32 +284,41 @@ function getFormAnswers() {
     }
 
 
-    // --- ADD BRANCHED HOUSING ANSWERS ---
-    // Only collect branched values if the corresponding section is visible to avoid errors
-    if (currentHousing === "Currently unhoused" && document.getElementById('unhoused-section').style.display === 'block') {
-        answers.unhoused_description = document.getElementById('unhoused_desc').value;
-        answers.unhoused_how_long = getRadioValue('unhoused_how_long');
-        answers.unhoused_where = getRadioValue('unhoused_where');
-        answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
-    } else if (currentHousing === "At risk of losing housing" && document.getElementById('at-risk-section').style.display === 'block') {
-        answers.risk_description = document.getElementById('risk_desc').value;
-        answers.risk_lease_in_name = getRadioValue('risk_lease_in_name') === 'true';
-        answers.risk_eviction_notice = getRadioValue('risk_eviction_notice') === 'true';
-        answers.risk_behind_bills = getRadioValue('risk_behind_bills') === 'true';
-        answers.risk_want_to_stay = getRadioValue('risk_want_to_stay') === 'true';
-        answers.risk_lease_length = getRadioValue('risk_lease_length');
-    } else if (currentHousing === "Staying with friends or family" && document.getElementById('family-section').style.display === 'block') {
-        answers.family_description = document.getElementById('family_desc').value;
-        answers.family_stay_length = getRadioValue('family_stay_length');
-        answers.family_contribute = getRadioValue('family_contribute') === 'true';
-        answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
-        answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
+    // --- UPDATED ADD BRANCHED HOUSING ANSWERS ---
+    if (currentHousing === "Currently unhoused") {
+        if (document.getElementById('unhoused-section').style.display === 'block') {
+            answers.unhoused_description = document.getElementById('unhoused_desc').value;
+            answers.unhoused_how_long = getRadioValue('unhoused_how_long');
+            answers.unhoused_where = getRadioValue('unhoused_where');
+            // Removed answers.unhoused_case_manager
+        }
+    } else if (currentHousing === "At risk of losing housing") {
+         if (document.getElementById('at-risk-section').style.display === 'block') {
+            answers.risk_description = document.getElementById('risk_desc').value;
+            answers.risk_lease_in_name = getRadioValue('risk_lease_in_name') === 'true';
+            answers.risk_eviction_notice = getRadioValue('risk_eviction_notice') === 'true';
+            answers.risk_behind_bills = getRadioValue('risk_behind_bills') === 'true';
+            answers.risk_want_to_stay = getRadioValue('risk_want_to_stay') === 'true';
+            answers.risk_lease_length = getRadioValue('risk_lease_length');
+        }
+    } else if (currentHousing === "Staying with friends or family") {
+        if (document.getElementById('family-section').style.display === 'block') {
+            answers.family_description = document.getElementById('family_desc').value;
+            answers.family_stay_length = getRadioValue('family_stay_length');
+            answers.family_contribute = getRadioValue('family_contribute') === 'true';
+            answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
+            answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
+        }
+    } else if (currentHousing === "Own place") { // NEW BRANCH
+        if (document.getElementById('own-place-section').style.display === 'block') {
+            answers.own_afford_length = getRadioValue('own_afford_length');
+            answers.own_behind_bills = getRadioValue('own_behind_bills') === 'true';
+        }
     }
-
     return answers;
 }
 
-// --- CSV DOWNLOAD LOGIC ---
+// --- CSV DOWNLOAD LOGIC (Keep for functionality) ---
 
 function triggerCSVDownload() {
     if (LAST_ANSWERS && LAST_MATCHES) {
