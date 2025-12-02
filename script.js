@@ -18,12 +18,15 @@ function showBranchingSections() {
     const status = getRadioValue('current_housing'); 
     
     // Hide all sections first
+    document.getElementById('own-place-section').style.display = 'none'; 
     document.getElementById('unhoused-section').style.display = 'none';
     document.getElementById('at-risk-section').style.display = 'none';
     document.getElementById('family-section').style.display = 'none';
     
     // Show the relevant section
-    if (status === "Currently unhoused") {
+    if (status === "I have my own place") {
+        document.getElementById('own-place-section').style.display = 'block';
+    } else if (status === "Currently unhoused") {
         document.getElementById('unhoused-section').style.display = 'block';
     } else if (status === "At risk of losing housing") {
         document.getElementById('at-risk-section').style.display = 'block';
@@ -205,13 +208,19 @@ function getFormAnswers() {
         pets: parseInt(getRadioValue('pets')),
         needs_accessible: getRadioValue('needs_accessible'),
         current_housing: currentHousing,
-        eviction: document.getElementById('eviction').checked, 
-        criminal_record: document.getElementById('criminal_record').checked,
-        needs_transit: document.getElementById('needs_transit').checked,
+        // Using getRadioValue correctly for "Other Factors"
+        eviction: getRadioValue('eviction'), 
+        criminal_record: getRadioValue('criminal_record'),
+        needs_transit: getRadioValue('needs_transit'),
     };
 
     // --- ADD BRANCHED ANSWERS ---
-    if (currentHousing === "Currently unhoused") {
+    if (currentHousing === "I have my own place") {
+        if (document.getElementById('own-place-section').style.display === 'block') {
+            // New Question: Are you behind on rent or utilities?
+            answers.own_place_behind_bills = getRadioValue('own_place_behind_bills') === 'true'; 
+        }
+    } else if (currentHousing === "Currently unhoused") {
         // Only collect values if the section is visible
         if (document.getElementById('unhoused-section').style.display === 'block') {
             answers.unhoused_description = document.getElementById('unhoused_desc').value;
@@ -264,7 +273,7 @@ function displayResults(matches) {
         
         resultsDiv.innerHTML += `
             <div class="match-result">
-                <h3>#${index + 1}: ${agency.Organization} (Score: ${match.score})</h3>
+                <h3>#${index + 1}: ${agency.Organization} (Score: ${match.score.toFixed(1)})</h3>
                 <p><strong>Phone:</strong> ${agency.Phone || 'N/A'} | <strong>Address:</strong> ${agency.Address || 'N/A'}</p>
                 <p><strong>Rent Range:</strong> $${agency.Min_Rent} – $${agency.Max_Rent} | <strong>Bedrooms:</strong> ${agency.Bedrooms}</p>
                 <p><strong>Pet Friendly:</strong> ${agency.Pet_Friendly || 'Unknown'} | <strong>Notes:</strong> ${agency.Notes || 'N/A'}</p>
@@ -318,7 +327,7 @@ function saveResultsAsCSV(answers, topMatches) {
         const row = [
             index + 1,
             escape(agency.Organization),
-            match.score,
+            match.score.toFixed(1), 
             escape(agency.Phone || 'N/A'),
             escape(agency.Address || 'N/A'),
             escape(`$${agency.Min_Rent} – $${agency.Max_Rent}`),
