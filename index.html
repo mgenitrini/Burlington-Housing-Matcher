@@ -147,13 +147,16 @@
                 <label>Current housing situation:</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="current_housing" value="Currently unhoused" required onclick="showBranchingSections()"> <span>Currently unhoused</span>
+                        <input type="radio" name="current_housing" value="Currently unhoused" required onclick="showBranchingSections()"> <span>Currently Unhoused (Couch Surfing/Sleeping in a Car/Sleeping Outside)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="current_housing" value="Staying with friends or family" onclick="showBranchingSections()"> <span>Living with friends or family</span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="current_housing" value="At risk of losing housing" onclick="showBranchingSections()"> <span>At risk of losing housing</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="current_housing" value="Staying with friends or family" onclick="showBranchingSections()"> <span>Staying with friends or family</span>
+                        <input type="radio" name="current_housing" value="Own place" onclick="showBranchingSections()"> <span>I have my own place</span>
                     </label>
                 </div>
             </div>
@@ -191,17 +194,7 @@
                         <input type="radio" name="unhoused_where" value="Motel"> <span>Motel</span>
                     </label>
                 </div>
-
-                <label>Are you working with a case manager?</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="unhoused_case_manager" value="true"> <span>Yes</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="unhoused_case_manager" value="false"> <span>No</span>
-                    </label>
                 </div>
-            </div>
 
             <div id="at-risk-section" class="form-group" style="display:none;">
                 <h2>At Risk of Losing Housing Section</h2>
@@ -263,7 +256,7 @@
             </div>
             
             <div id="family-section" class="form-group" style="display:none;">
-                <h2>Staying With Family or Friends Section</h2>
+                <h2>Living with Friends or Family Section</h2>
                 <label for="family_desc">If you want, briefly describe your situation (optional):</label>
                 <input type="text" id="family_desc">
                 
@@ -273,10 +266,10 @@
                         <input type="radio" name="family_stay_length" value="1"> <span>1–3 weeks</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="family_stay_length" value="2"> <span>2–5 months</span>
+                        <input type="radio" name="family_stay_length" value="2"> <span>4-5 months</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="family_stay_length" value="3"> <span>1 year or longer</span>
+                        <input type="radio" name="family_stay_length" value="3"> <span>6 months or longer</span>
                     </label>
                 </div>
                 
@@ -307,6 +300,33 @@
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="family_perm_plan" value="false"> <span>No</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="own-place-section" class="form-group" style="display:none;">
+                <h2>I Have My Own Place Section</h2>
+                
+                <label>How much longer can you afford to stay there?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="own_afford_length" value="1"> <span>1-3 weeks</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="own_afford_length" value="2"> <span>2-3 months</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="own_afford_length" value="3"> <span>4+ months</span>
+                    </label>
+                </div>
+
+                <label>Are you behind on rent or utilities?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="own_behind_bills" value="true"> <span>Yes</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="own_behind_bills" value="false"> <span>No</span>
                     </label>
                 </div>
             </div>
