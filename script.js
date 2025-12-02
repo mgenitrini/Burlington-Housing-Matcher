@@ -293,14 +293,14 @@ function getFormAnswers() {
     } else if (currentHousing === "Staying with friends or family") {
         if (document.getElementById('family-section').style.display === 'block') {
             answers.family_description = document.getElementById('family_desc').value;
-            answers.family_stay_length = getRadioValue('family_stay_length');
+            // UPDATED: Now collects the new afford length data
+            answers.family_afford_length = getRadioValue('family_afford_length');
             answers.family_contribute = getRadioValue('family_contribute') === 'true';
             answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
             answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
         }
     } else if (currentHousing === "Own place") { 
         if (document.getElementById('own-place-section').style.display === 'block') {
-            // CORRECTED: Added the two new required values
             answers.own_afford_length = getRadioValue('own_afford_length');
             answers.own_behind_bills = getRadioValue('own_behind_bills') === 'true';
         }
