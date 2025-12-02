@@ -148,13 +148,14 @@ function scoreAgency(agency, answers) {
         const budgetMax = monthlyIncome / 3;
         if (minRent <= budgetMax) {
             score += 3;
-            reasons.push("Rent range roughly fits your income.");
-        } else if (minRent <= budgetMax * 1.2) {
+            reasons.push("Rent range roughly fits your income (below 33% of income).");
+        } else if (minRent <= budgetMax * 1.2) { // 33% to 40% of income
             score += 1;
-            reasons.push("Rent is a bit high but possibly workable.");
+            reasons.push("Rent is a bit high, using 33%-40% of income, but possibly workable.");
         } else {
             score -= 4;
-            reasons.push("Rent may be too high for your income.");
+            // NOTE FOR RENT TOO HIGH
+            reasons.push("**WARNING: Rent may be too high for your current income (over 40% of income).**");
         }
     }
 
@@ -293,7 +294,8 @@ function getFormAnswers() {
     } else if (currentHousing === "Staying with friends or family") {
         if (document.getElementById('family-section').style.display === 'block') {
             answers.family_description = document.getElementById('family_desc').value;
-            answers.family_afford_length = getRadioValue('family_afford_length');
+            // Name changed to family_afford_length
+            answers.family_afford_length = getRadioValue('family_afford_length'); 
             answers.family_contribute = getRadioValue('family_contribute') === 'true';
             answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
             answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
@@ -331,7 +333,6 @@ function displayResults(matches) {
         
         const formattedScore = match.score.toFixed(1);
 
-        // --- THE LINE BELOW HAS BEEN MODIFIED ---
         resultsDiv.innerHTML += `
             <div class="match-result">
                 <h3>#${index + 1}: ${agency.Organization} (Score: ${formattedScore}/10 fit)</h3> 
