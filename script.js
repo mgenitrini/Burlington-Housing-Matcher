@@ -22,6 +22,10 @@ function updateIncomeDisplay(val) {
     document.getElementById('income-display').textContent = formatter.format(val);
 }
 
+// *** FIX: Make the function globally accessible for the HTML oninput handler ***
+window.updateIncomeDisplay = updateIncomeDisplay; 
+
+
 // --- BRANCHING LOGIC ---
 
 // Function to handle the visibility of the detailed breed question
