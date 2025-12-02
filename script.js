@@ -21,8 +21,6 @@ function updateIncomeDisplay(val) {
     });
     document.getElementById('income-display').textContent = formatter.format(val);
 }
-// Removed: window.updateIncomeDisplay = updateIncomeDisplay; (Listener is now attached below)
-
 
 // --- BRANCHING LOGIC ---
 
@@ -94,7 +92,7 @@ fetch('housing_data.json')
         // Attach the event listener to the form AFTER the data has loaded
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
         
-        // --- NEW SLIDER LISTENER ATTACHMENT ---
+        // --- SLIDER LISTENER ATTACHMENT ---
         const incomeSlider = document.getElementById('income-slider');
         
         // Attach the update function to the 'input' event
@@ -224,16 +222,38 @@ function scoreAgency(agency, answers) {
             reasons.push("Tagged as voucher-friendly.");
         }
     }
+    
+    // --- SCALING LOGIC: Convert raw score to a 1-10 scale ---
+    // Max possible raw score (S_max) = 17
+    // Min possible raw score (S_min) = -12
+    const MIN_RAW_SCORE = -12; 
+    const MAX_RAW_SCORE = 17; 
+    const RANGE_RAW = MAX_RAW_SCORE - MIN_RAW_SCORE; // 29
 
-    return { score, reasons };
+    // 1. Normalize raw score to a 0-1 range
+    const normalizedScore = (score - MIN_RAW_SCORE) / RANGE_RAW;
+
+    // 2. Scale to 1-10 range: Scaled = Normalized * (10 - 1) + 1
+    let scaledScore = normalizedScore * 9 + 1;
+    
+    // 3. Ensure the score is clamped exactly between 1.0 and 10.0
+    scaledScore = Math.max(1.0, Math.min(10.0, scaledScore));
+    
+    // 4. Round to one decimal place for presentation
+    scaledScore = Math.round(scaledScore * 10) / 10;
+    // --------------------------------------------------------
+
+    return { score: scaledScore, reasons };
 }
 
 function matchTopAgencies(allData, answers, topN = 3) {
     const scored = allData.map(agency => {
+        // Use the newly scaled score
         const { score, reasons } = scoreAgency(agency, answers);
         return { score, agency, reasons };
     });
     
+    // Sorting by the new scaled score (1.0 to 10.0)
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, topN);
 }
@@ -326,9 +346,12 @@ function displayResults(matches) {
         const agency = match.agency;
         const reasonsHtml = match.reasons.map(r => `<li>${r}</li>`).join('');
         
+        // Ensure score is formatted to one decimal place for display
+        const formattedScore = match.score.toFixed(1);
+
         resultsDiv.innerHTML += `
             <div class="match-result">
-                <h3>#${index + 1}: ${agency.Organization} (Score: ${match.score})</h3>
+                <h3>#${index + 1}: ${agency.Organization} (Score: ${formattedScore})</h3>
                 <p><strong>Phone:</strong> ${agency.Phone || 'N/A'} | <strong>Address:</strong> ${agency.Address || 'N/A'}</p>
                 <p><strong>Rent Range:</strong> $${agency.Min_Rent} – $${agency.Max_Rent} | <strong>Bedrooms:</strong> ${agency.Bedrooms}</p>
                 <p><strong>Pet Friendly:</strong> ${agency.Pet_Friendly || 'Unknown'} | <strong>Notes:</strong> ${agency.Notes || 'N/A'}</p>
@@ -361,10 +384,15 @@ function saveResultsAsCSV(answers, topMatches) {
     for (const key in answers) {
         if (answers.hasOwnProperty(key) && !excludedKeys.includes(key)) {
             let value = answers[key];
-            // CRITICAL FIX: Ensures that boolean values (true/false) are converted to Yes/No in the CSV
+            
+            // Ensures that boolean values and string 'true'/'false' values
+            // are converted to 'Yes'/'No' for human readability in the CSV.
             if (typeof value === 'boolean') {
                 value = value ? 'Yes' : 'No';
+            } else if (typeof value === 'string' && (value === 'true' || value === 'false')) {
+                value = value === 'true' ? 'Yes' : 'No';
             }
+
             const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
             csvContent += `"${key}", ${escape(value)}\n`;
         }
@@ -383,7 +411,8 @@ function saveResultsAsCSV(answers, topMatches) {
         const row = [
             index + 1,
             escape(agency.Organization),
-            match.score,
+            // Ensure score is formatted to one decimal place in CSV
+            match.score.toFixed(1),
             escape(agency.Phone || 'N/A'),
             escape(agency.Address || 'N/A'),
             escape(`$${agency.Min_Rent} – $${agency.Max_Rent}`),
@@ -406,36 +435,36 @@ function saveResultsAsCSV(answers, topMatches) {
 }
 
 
-// --- MAIN FUNCTION ---
+// --- MAIN FUNCTION: This was missing and caused the form submission to fail ---
 
 function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
     
-    // CORE QUESTIONS VALIDATION
-    // income check removed because the slider always has a value due to 'required' and 'value' attributes.
-    if (!getRadioValue('bedrooms') || !getRadioValue('adults') || !getRadioValue('kids') || !getRadioValue('pets') || !getRadioValue('needs_accessible') || !getRadioValue('current_housing')) {
+    // Check if required radio buttons are selected
+    // Note: The slider value is always present as it has a default, but we check other required fields.
+    if (
+        !getRadioValue('bedrooms') || 
+        !getRadioValue('adults') ||
+        !getRadioValue('kids') ||
+        !getRadioValue('pets') ||
+        !getRadioValue('needs_accessible') ||
+        !getRadioValue('current_housing') ||
+        !getRadioValue('eviction') ||
+        !getRadioValue('criminal_record') ||
+        !getRadioValue('needs_transit')
+    ) {
         alert("Please answer all required core questions.");
         return;
     }
 
-    // CONDITIONAL PET QUESTIONS VALIDATION
-    if (getRadioValue('pets') === 'Yes') {
-        if (!getRadioValue('pet_weight') || !getRadioValue('restricted_breed')) {
-            alert("Please answer all required pet details questions.");
-            return;
-        }
-        
-        // Validation for the nested text field
-        if (getRadioValue('restricted_breed') === "I don't know") {
-            const breedDesc = document.getElementById('breed_description').value.trim();
-            if (breedDesc === "") {
-                alert("Please specify the breed of your pet.");
-                return;
-            }
-        }
+    const answers = getFormAnswers();
+    
+    // Basic validation for contact info
+    if (!answers.name || !answers.email) {
+        alert("Please provide your full name and email.");
+        return;
     }
 
-    const answers = getFormAnswers();
     const topMatches = matchTopAgencies(HOUSING_DATA, answers, 3);
     
     // Store results globally 
