@@ -1,176 +1,183 @@
-/* --- Global Styles --- */
-body { 
-    font-family: 'Montserrat', Arial, sans-serif; 
-    max-width: 800px; 
-    margin: 0 auto; 
-    padding: 30px; 
-    background-color: #f0f4f8; 
-    color: #334e68; 
+/* --- 1. GLOBAL STYLES & TYPOGRAPHY --- */
+:root {
+    --primary-color: #1a4d8c; /* Deep Blue */
+    --primary-dark: #0d3261;
+    --accent-color: #007bff; /* Bright Blue */
+    --bg-color: #f4f7f9; /* Light Gray Background */
+    --text-color: #333;
+    --border-color: #ccc;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
 h1 {
-    color: #102a43; 
+    color: var(--primary-color);
+    font-size: 2.2em;
     font-weight: 700;
 }
 
-/* --- Form Container --- */
-#survey-container {
-    background-color: #ffffff;
-    padding: 40px; 
-    border-radius: 12px; 
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
-}
-
-/* --- Logo Styling (Correct Hat Position) --- */
-#title-section {
-    text-align: center;
-    margin-bottom: 20px;
-}
-#form-logo {
-    height: 0.8em; 
-    width: auto;
-    vertical-align: middle; 
-    margin-left: 10px; 
-    display: inline; 
-}
-
-/* --- Form Groups --- */
-.form-group { 
-    border: 1px solid #e1e9f1; 
-    padding: 20px; 
-    margin-bottom: 25px;
-    border-radius: 8px;
-    background-color: #ffffff; 
-}
-.form-group h2 {
-    color: #2e86de; 
-    border-bottom: 3px solid #2e86de; 
-    padding-bottom: 8px;
-    margin-top: 0;
+h2 {
+    color: var(--primary-color);
+    font-size: 1.5em;
     font-weight: 600;
+    margin-top: 0;
 }
 
-/* Question Font Size (Big and Clear) */
-label { 
-    display: block; 
-    font-weight: 600; 
-    margin-top: 20px; 
-    font-size: 1.15em; 
-    color: #334e68; 
+/* --- 2. FORM STRUCTURE (CARDS) --- */
+.form-group {
+    /* Replaces the old thin border with a modern card design */
+    border: none;
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
 }
-input[type="text"], input[type="email"] { 
-    width: 100%; 
-    padding: 12px; 
-    margin-top: 8px; 
-    border: 1px solid #c8d3e1;
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: var(--primary-color); /* Emphasize question labels */
+}
+
+/* --- 3. INPUTS & BUTTONS --- */
+
+/* Text/Email Inputs */
+input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    box-sizing: border-box; 
-    transition: border-color 0.3s;
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
+
 input[type="text"]:focus, input[type="email"]:focus {
-    border-color: #2e86de; 
-    box-shadow: 0 0 5px rgba(46, 134, 222, 0.5);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
     outline: none;
 }
 
-/* --- Radio Group Styling (RELIABLE STACKED LAYOUT) --- */
-.radio-group {
-    display: block; /* Ensures the options stack vertically */
-    margin-top: 10px;
-}
-
-/* Style for each answer option wrapper */
-.radio-option {
-    display: block; /* Makes each option take full width */
-    margin-top: 5px;
-    background: #f7f9fc; 
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid #e1e9f1;
-    transition: background-color 0.2s;
-    font-size: 1em; 
-}
-
-/* Style the label/text inside the option */
-.radio-option label {
-    display: flex;
-    align-items: center;
-    margin: 0; /* Remove top margin from label inside option */
-    font-size: 1em; /* Reset font size for the option text */
-    font-weight: 400; /* Regular weight for option text */
-}
-
-/* Style the native radio button */
-.radio-option input[type="radio"] {
-    margin-right: 10px;
-    transform: scale(1.1); 
-    opacity: 1; 
-    width: auto;
-    height: auto;
-}
-
-/* Highlight the selected option text */
-.radio-option input[type="radio"]:checked + span {
-    font-weight: 700;
-    color: #102a43;
-}
-/* Highlight the container on selection */
-.radio-option input[type="radio"]:checked {
-    border-color: #2e86de;
-}
-
-/* --- Button Styles (Submit/Download) --- */
-button {
-    background-color: #2ecc71; 
+/* Primary Button Styling */
+button[type="submit"], #download-csv-button {
+    background-color: var(--primary-color);
     color: white;
-    padding: 15px 20px; 
+    padding: 12px 25px;
     border: none;
-    border-radius: 6px;
-    cursor: pointer;
+    border-radius: 8px;
     font-size: 1.1em;
-    font-weight: 700;
-    margin-top: 30px;
-    width: 100%;
-    transition: background-color 0.3s, transform 0.1s;
-    box-shadow: 0 4px 6px rgba(46, 204, 113, 0.4);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 20px;
 }
-button:hover {
-    background-color: #27ae60;
+
+button[type="submit"]:hover, #download-csv-button:hover {
+    background-color: var(--primary-dark);
     transform: translateY(-1px);
 }
 
-/* --- Results Display --- */
-#results-container { 
-    margin-top: 40px; 
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+/* --- 4. RADIO & CHECKBOX GROUPS (Modern Look) --- */
+
+.radio-group, .checkbox-option {
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
 }
-.match-result { 
-    border: 1px solid #c8d3e1; 
-    padding: 20px; 
-    margin-bottom: 20px; 
-    background-color: #f7f9fc; 
+
+/* Style for individual radio/checkbox labels */
+.radio-option, .checkbox-option label {
+    flex: 1 1 auto; /* Allows options to grow/shrink but keep a base size */
+    min-width: 120px;
+}
+
+/* Hide default radio/checkbox inputs */
+.radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
+    /* Hide the actual input but keep it functional */
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the label wrapper as the visible button */
+.radio-option label, .checkbox-option label {
+    display: block;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: normal;
+    transition: all 0.2s;
 }
-.match-result h3 { 
-    color: #2e86de; 
+
+/* Checked/Selected State */
+.radio-option input[type="radio"]:checked + label,
+.checkbox-option input[type="checkbox"]:checked + label {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(26, 77, 140, 0.3);
+}
+
+/* Hover State */
+.radio-option label:hover, .checkbox-option label:hover {
+    background-color: #f0f0f0;
+    border-color: var(--accent-color);
+}
+
+
+/* --- 5. RESULTS CONTAINER --- */
+
+#results-container {
+    margin-top: 40px;
+    padding-top: 20px;
+}
+
+.match-result {
+    /* Modern card look for results */
+    background-color: #e9f5ff; /* Very light blue background */
+    border-left: 5px solid var(--primary-color); /* Accent stripe */
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.match-result h3 {
+    color: var(--primary-color);
     margin-top: 0;
-    font-size: 1.25em;
+    border-bottom: 1px solid #cce0f0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
 }
-.match-result ul {
-    padding-left: 20px;
+
+.match-result p {
+    line-height: 1.4;
     font-size: 0.95em;
 }
-.match-result li {
-    margin-bottom: 5px;
+
+.match-result ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    font-size: 0.9em;
     color: #555;
-}
-#download-csv-button {
-    background-color: #007bff; 
-    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.4);
-    margin-top: 20px;
-}
-#download-csv-button:hover {
-    background-color: #0056b3;
 }
