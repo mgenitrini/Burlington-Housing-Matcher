@@ -11,6 +11,17 @@ function getRadioValue(name) {
     return element ? element.value : null;
 }
 
+// --- NEW FUNCTION: Update the income display in real-time ---
+function updateIncomeDisplay(val) {
+    const formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    document.getElementById('income-display').textContent = formatter.format(val);
+}
+
 // --- BRANCHING LOGIC ---
 
 // Function to handle the visibility of the detailed breed question
@@ -83,6 +94,10 @@ fetch('housing_data.json')
         // Initial call to hide sections on page load
         showBranchingSections(); 
         showPetSections(); 
+        
+        // INITIALIZE SLIDER DISPLAY
+        const initialIncome = document.getElementById('income-slider').value;
+        updateIncomeDisplay(initialIncome);
     })
     .catch(error => {
         console.error("Could not load housing data:", error);
@@ -125,7 +140,6 @@ function scoreAgency(agency, answers) {
     const bedroomPref = answers.bedrooms;
     const kids = answers.kids;
     const currentHousing = answers.current_housing;
-    // UPDATED: needsAccessible will be 'Yes' or 'No'
     const needsAccessible = answers.needs_accessible; 
 
     // 1. Affordability
@@ -178,7 +192,7 @@ function scoreAgency(agency, answers) {
     }
 
     // 5. Accessibility
-    if (needsAccessible === "Yes") { // UPDATED: Checks for 'Yes'
+    if (needsAccessible === "Yes") { 
         if (matchTags.includes("accessible") || matchTags.includes("accessibility-support")) {
             score += 2;
             reasons.push("May be more accessible-friendly.");
@@ -216,19 +230,21 @@ function matchTopAgencies(allData, answers, topN = 3) {
 // --- FORM DATA COLLECTION ---
 
 function getFormAnswers() {
-    const baseIncome = parseInt(getRadioValue('income'));
+    // UPDATED: Reading from the slider element directly
+    const incomeSlider = document.getElementById('income-slider');
+    const baseIncome = parseInt(incomeSlider.value);
+
     const currentHousing = getRadioValue('current_housing');
     const hasPets = getRadioValue('pets');
     
     const answers = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
-        total_income: baseIncome, 
+        total_income: baseIncome, // Now reading from slider
         bedrooms: parseInt(getRadioValue('bedrooms')),
         adults: parseInt(getRadioValue('adults')), 
         kids: parseInt(getRadioValue('kids')), 
         pets: hasPets, 
-        // UPDATED: Collecting 'Yes' or 'No' string
         needs_accessible: getRadioValue('needs_accessible'),
         current_housing: currentHousing,
         eviction: getRadioValue('eviction'), 
@@ -385,7 +401,8 @@ function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
     
     // CORE QUESTIONS VALIDATION
-    if (!getRadioValue('income') || !getRadioValue('bedrooms') || !getRadioValue('adults') || !getRadioValue('kids') || !getRadioValue('pets') || !getRadioValue('needs_accessible') || !getRadioValue('current_housing')) {
+    // income check removed because the slider always has a value due to 'required' and 'value' attributes.
+    if (!getRadioValue('bedrooms') || !getRadioValue('adults') || !getRadioValue('kids') || !getRadioValue('pets') || !getRadioValue('needs_accessible') || !getRadioValue('current_housing')) {
         alert("Please answer all required core questions.");
         return;
     }
