@@ -351,17 +351,17 @@ function displayResults(matches) {
               `
             : '<p>No major negative factors identified based on your answers.</p>';
             
-        // Determine if the 'Why this matched' section should be displayed
+        // Determine if the 'Why this may be a match' section should be displayed (Updated)
         const positiveSection = match.positiveReasons.length > 0
             ? `
-                <p><strong>Why this matched:</strong></p>
+                <p><strong>Why this may be a match:</strong></p>
                 <ul>${positiveHtml}</ul>
               `
             : '<p>No specific positive matches identified for this listing beyond basic criteria.</p>';
 
         resultsDiv.innerHTML += `
             <div class="match-result">
-                <h3>#${index + 1}: ${agency.Organization} (Score: ${formattedScore}/10 fit)</h3> 
+                <h3>#${index + 1}: ${agency.Organization} (${formattedScore}/10 fit)</h3> 
                 <p><strong>Phone:</strong> ${agency.Phone || 'N/A'} | <strong>Address:</strong> ${agency.Address || 'N/A'}</p>
                 <p><strong>Rent Range:</strong> $${agency.Min_Rent} – $${agency.Max_Rent} | <strong>Bedrooms:</strong> ${agency.Bedrooms}</p>
                 <p><strong>Pet Friendly:</strong> ${agency.Pet_Friendly || 'Unknown'} | <strong>Notes:</strong> ${agency.Notes || 'N/A'}</p>
