@@ -277,7 +277,7 @@ function saveResultsAsCSV(answers, topMatches) {
     for (const key in answers) {
         if (answers.hasOwnProperty(key) && !excludedKeys.includes(key)) {
             let value = answers[key];
-            // CRITICAL FIX: Ensures that true/false values are converted to Yes/No in the CSV
+            // CRITICAL FIX: Ensures that boolean values (true/false) are converted to Yes/No in the CSV
             if (typeof value === 'boolean') {
                 value = value ? 'Yes' : 'No';
             }
