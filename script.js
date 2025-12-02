@@ -189,7 +189,7 @@ function matchTopAgencies(allData, answers, topN = 3) {
 // --- FORM HANDLER AND DISPLAY ---
 
 /**
- * NEW FUNCTION: Handles showing and hiding the conditional sections 
+ * Handles showing and hiding the conditional sections 
  * when a user selects a "Current housing situation" radio button.
  */
 function showBranchingSections() {
@@ -197,7 +197,6 @@ function showBranchingSections() {
     const atRiskDiv = document.getElementById('at-risk-section');
     const familyDiv = document.getElementById('family-section');
     
-    // Use getRadioValue to find which current_housing option is checked
     const selectedHousing = getRadioValue('current_housing'); 
 
     // Hide all sections initially
@@ -230,7 +229,7 @@ function getFormAnswers() {
     const needsAccessible = getRadioValue('needs_accessible');
     const currentHousing = getRadioValue('current_housing');
     
-    // Other Factors (now radio buttons)
+    // Other Factors 
     const eviction = getRadioValue('eviction'); 
     const criminalRecord = getRadioValue('criminal_record');
     const needsTransit = getRadioValue('needs_transit');
