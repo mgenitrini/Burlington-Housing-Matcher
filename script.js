@@ -184,10 +184,9 @@ function getFormAnswers() {
         pets: parseInt(getRadioValue('pets')),
         needs_accessible: getRadioValue('needs_accessible'),
         current_housing: currentHousing,
-        // ✅ CORRECTED LINES: Using getRadioValue() to read the radio groups' 'Yes'/'No' value
-        eviction: getRadioValue('eviction'), 
-        criminal_record: getRadioValue('criminal_record'),
-        needs_transit: getRadioValue('needs_transit'),
+        eviction: document.getElementById('eviction').checked, 
+        criminal_record: document.getElementById('criminal_record').checked,
+        needs_transit: document.getElementById('needs_transit').checked,
     };
 
     // --- ADD BRANCHED ANSWERS ---
