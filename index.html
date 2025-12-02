@@ -30,7 +30,7 @@
             <div class="form-group">
                 <h2>Core Needs</h2>
                 
-                <label>Monthly income:</label>
+                <label>Monthly Household Income:</label>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="income" value="1250" required> <span>In between 1,000–1,500</span>
@@ -43,26 +43,7 @@
                     </label>
                 </div>
                 
-                <label>Partner's monthly income (if applicable):</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="partner_income" value="0" required> <span>I do not combine income</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="partner_income" value="750"> <span>Under 1,000</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="partner_income" value="1250"> <span>1,000–1,500</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="partner_income" value="1750"> <span>1,500–2,000</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="partner_income" value="2500"> <span>Over 2,000</span>
-                    </label>
-                </div>
-
-                <label>Bedroom amount preference:</label>
+                <label>Preferred Number of Bedrooms:</label>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="bedrooms" value="1" required> <span>1</span>
@@ -78,48 +59,94 @@
                     </label>
                 </div>
 
-                <label>Do you have dependents? If so, how many?</label>
+                <label>How Many Adults Will Be Living in this Apartment?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="dependents" value="0" required> <span>0</span>
+                        <input type="radio" name="adults" value="1" required> <span>1</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="dependents" value="1"> <span>1</span>
+                        <input type="radio" name="adults" value="2"> <span>2</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="dependents" value="2"> <span>2</span>
+                        <input type="radio" name="adults" value="3"> <span>3</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="dependents" value="3"> <span>3+</span>
+                        <input type="radio" name="adults" value="4"> <span>4+</span>
                     </label>
                 </div>
 
-                <label>Pet situation:</label>
+                <label>How Many Kids Do You Have?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="pets" value="0" required> <span>No pets</span>
+                        <input type="radio" name="kids" value="0" required> <span>0</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="pets" value="1"> <span>1 pet</span>
+                        <input type="radio" name="kids" value="1"> <span>1</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="pets" value="2"> <span>2+ pets</span>
+                        <input type="radio" name="kids" value="2"> <span>2</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="kids" value="3"> <span>3</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="kids" value="4"> <span>4+</span>
+                    </label>
+                </div>
+
+                <label>Do You Have Pets?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="pets" value="No" required onclick="showPetSections()"> <span>No</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="pets" value="Yes" onclick="showPetSections()"> <span>Yes</span>
                     </label>
                 </div>
                 
-                <label>Do you need disability accessible housing?</label>
+                <div id="pet-details-section" class="form-group" style="display:none; padding: 20px 20px 5px 20px; border: 1px dashed #2e86de;">
+                    <h2>Pet Details</h2>
+                    
+                    <label>Is Your Pet Over 25 lbs?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="pet_weight" value="Yes"> <span>Yes</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="pet_weight" value="No"> <span>No</span>
+                        </label>
+                    </div>
+
+                    <label>Is Your Pet a Restricted Breed?</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="restricted_breed" value="Yes" onclick="showBreedField()"> <span>Yes</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="restricted_breed" value="No" onclick="showBreedField()"> <span>No</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="restricted_breed" value="I don't know" onclick="showBreedField()"> <span>I don't know</span>
+                        </label>
+                    </div>
+
+                    <div id="breed-field-section" style="display:none; margin-top: 15px;">
+                        <label for="breed_description">What Breed is Your Pet?</label>
+                        <input type="text" id="breed_description" placeholder="e.g., Terrier mix, Labrador">
+                    </div>
+
+                </div>
+                
+                <label>Do You Need Accessibility Accommodations? (first floor, ramps, elevators, parking, etc.)</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="false" required> <span>No, I do not</span>
+                        <input type="radio" name="needs_accessible" value="No" required> <span>No</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="semi"> <span>Not fully accessible</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="true"> <span>Yes, fully accessible</span>
+                        <input type="radio" name="needs_accessible" value="Yes"> <span>Yes</span>
                     </label>
                 </div>
-            </div>
+                </div>
 
             <div class="form-group">
                 <h2>Current Situation</h2>
