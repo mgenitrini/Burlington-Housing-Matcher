@@ -82,29 +82,28 @@ function showBranchingSections() {
 fetch('housing_data.json')
     .then(response => {
         if (!response.ok) {
-            // This is the source of your "Could not load housing data" error if the file path is wrong
+            // This error check is critical for debugging data loading!
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
         HOUSING_DATA = data;
-        // Attach the event listener to the form AFTER the data has loaded
+        // Attach the form submission listener
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
         
-        // --- SLIDER LISTENER ATTACHMENT ---
+        // --- SLIDER LISTENER ATTACHMENT (FIX for stuck slider display) ---
         const incomeSlider = document.getElementById('income-slider');
         
-        // Attach the update function to the 'input' event
+        // Attach the update function to the 'input' event to make it drag-responsive
         incomeSlider.addEventListener('input', (event) => {
             updateIncomeDisplay(event.target.value);
         });
         
-        // Initial call to hide sections on page load
+        // Initial call to hide sections and set initial display value
         showBranchingSections(); 
         showPetSections(); 
         
-        // INITIALIZE SLIDER DISPLAY
         const initialIncome = incomeSlider.value;
         updateIncomeDisplay(initialIncome);
     })
@@ -114,7 +113,7 @@ fetch('housing_data.json')
             `<h2>Error: Could not load housing data. Check if 'housing_data.json' is in the same folder.</h2>`;
     });
 
-// --- SCORING AND MATCHING LOGIC ---
+// --- SCORING AND MATCHING LOGIC (The core of your application) ---
 
 function parseBedroomRange(bedroomStr) {
     if (typeof bedroomStr === 'number') {
@@ -224,36 +223,25 @@ function scoreAgency(agency, answers) {
     }
     
     // --- SCALING LOGIC: Convert raw score to a 1-10 scale ---
-    // Max possible raw score (S_max) = 17
-    // Min possible raw score (S_min) = -12
     const MIN_RAW_SCORE = -12; 
     const MAX_RAW_SCORE = 17; 
-    const RANGE_RAW = MAX_RAW_SCORE - MIN_RAW_SCORE; // 29
+    const RANGE_RAW = MAX_RAW_SCORE - MIN_RAW_SCORE;
 
-    // 1. Normalize raw score to a 0-1 range
     const normalizedScore = (score - MIN_RAW_SCORE) / RANGE_RAW;
-
-    // 2. Scale to 1-10 range: Scaled = Normalized * (10 - 1) + 1
     let scaledScore = normalizedScore * 9 + 1;
     
-    // 3. Ensure the score is clamped exactly between 1.0 and 10.0
     scaledScore = Math.max(1.0, Math.min(10.0, scaledScore));
-    
-    // 4. Round to one decimal place for presentation
     scaledScore = Math.round(scaledScore * 10) / 10;
-    // --------------------------------------------------------
 
     return { score: scaledScore, reasons };
 }
 
 function matchTopAgencies(allData, answers, topN = 3) {
     const scored = allData.map(agency => {
-        // Use the newly scaled score
         const { score, reasons } = scoreAgency(agency, answers);
         return { score, agency, reasons };
     });
     
-    // Sorting by the new scaled score (1.0 to 10.0)
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, topN);
 }
@@ -261,7 +249,6 @@ function matchTopAgencies(allData, answers, topN = 3) {
 // --- FORM DATA COLLECTION ---
 
 function getFormAnswers() {
-    // Reading from the slider element directly
     const incomeSlider = document.getElementById('income-slider');
     const baseIncome = parseInt(incomeSlider.value);
 
@@ -295,32 +282,27 @@ function getFormAnswers() {
 
 
     // --- ADD BRANCHED HOUSING ANSWERS ---
-    if (currentHousing === "Currently unhoused") {
-        // Only collect values if the section is visible
-        if (document.getElementById('unhoused-section').style.display === 'block') {
-            answers.unhoused_description = document.getElementById('unhoused_desc').value;
-            answers.unhoused_how_long = getRadioValue('unhoused_how_long');
-            answers.unhoused_where = getRadioValue('unhoused_where');
-            answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
-        }
-    } else if (currentHousing === "At risk of losing housing") {
-         if (document.getElementById('at-risk-section').style.display === 'block') {
-            answers.risk_description = document.getElementById('risk_desc').value;
-            answers.risk_lease_in_name = getRadioValue('risk_lease_in_name') === 'true';
-            answers.risk_eviction_notice = getRadioValue('risk_eviction_notice') === 'true';
-            answers.risk_behind_bills = getRadioValue('risk_behind_bills') === 'true';
-            answers.risk_want_to_stay = getRadioValue('risk_want_to_stay') === 'true';
-            answers.risk_lease_length = getRadioValue('risk_lease_length');
-        }
-    } else if (currentHousing === "Staying with friends or family") {
-        if (document.getElementById('family-section').style.display === 'block') {
-            answers.family_description = document.getElementById('family_desc').value;
-            answers.family_stay_length = getRadioValue('family_stay_length');
-            answers.family_contribute = getRadioValue('family_contribute') === 'true';
-            answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
-            answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
-        }
+    // Only collect branched values if the corresponding section is visible to avoid errors
+    if (currentHousing === "Currently unhoused" && document.getElementById('unhoused-section').style.display === 'block') {
+        answers.unhoused_description = document.getElementById('unhoused_desc').value;
+        answers.unhoused_how_long = getRadioValue('unhoused_how_long');
+        answers.unhoused_where = getRadioValue('unhoused_where');
+        answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
+    } else if (currentHousing === "At risk of losing housing" && document.getElementById('at-risk-section').style.display === 'block') {
+        answers.risk_description = document.getElementById('risk_desc').value;
+        answers.risk_lease_in_name = getRadioValue('risk_lease_in_name') === 'true';
+        answers.risk_eviction_notice = getRadioValue('risk_eviction_notice') === 'true';
+        answers.risk_behind_bills = getRadioValue('risk_behind_bills') === 'true';
+        answers.risk_want_to_stay = getRadioValue('risk_want_to_stay') === 'true';
+        answers.risk_lease_length = getRadioValue('risk_lease_length');
+    } else if (currentHousing === "Staying with friends or family" && document.getElementById('family-section').style.display === 'block') {
+        answers.family_description = document.getElementById('family_desc').value;
+        answers.family_stay_length = getRadioValue('family_stay_length');
+        answers.family_contribute = getRadioValue('family_contribute') === 'true';
+        answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
+        answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
     }
+
     return answers;
 }
 
@@ -346,7 +328,6 @@ function displayResults(matches) {
         const agency = match.agency;
         const reasonsHtml = match.reasons.map(r => `<li>${r}</li>`).join('');
         
-        // Ensure score is formatted to one decimal place for display
         const formattedScore = match.score.toFixed(1);
 
         resultsDiv.innerHTML += `
@@ -385,8 +366,6 @@ function saveResultsAsCSV(answers, topMatches) {
         if (answers.hasOwnProperty(key) && !excludedKeys.includes(key)) {
             let value = answers[key];
             
-            // Ensures that boolean values and string 'true'/'false' values
-            // are converted to 'Yes'/'No' for human readability in the CSV.
             if (typeof value === 'boolean') {
                 value = value ? 'Yes' : 'No';
             } else if (typeof value === 'string' && (value === 'true' || value === 'false')) {
@@ -411,7 +390,6 @@ function saveResultsAsCSV(answers, topMatches) {
         const row = [
             index + 1,
             escape(agency.Organization),
-            // Ensure score is formatted to one decimal place in CSV
             match.score.toFixed(1),
             escape(agency.Phone || 'N/A'),
             escape(agency.Address || 'N/A'),
@@ -435,13 +413,12 @@ function saveResultsAsCSV(answers, topMatches) {
 }
 
 
-// --- MAIN FUNCTION: This was missing and caused the form submission to fail ---
+// --- MAIN FUNCTION: Runs the matching logic on form submit ---
 
 function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
     
-    // Check if required radio buttons are selected
-    // Note: The slider value is always present as it has a default, but we check other required fields.
+    // Basic check for required core radio buttons
     if (
         !getRadioValue('bedrooms') || 
         !getRadioValue('adults') ||
@@ -462,6 +439,12 @@ function runSurvey(event) {
     // Basic validation for contact info
     if (!answers.name || !answers.email) {
         alert("Please provide your full name and email.");
+        return;
+    }
+    
+    // Check if HOUSING_DATA was successfully loaded
+    if (HOUSING_DATA.length === 0) {
+        alert("The housing data has not loaded correctly. Check the console for errors.");
         return;
     }
 
