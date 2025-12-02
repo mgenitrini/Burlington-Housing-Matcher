@@ -22,9 +22,8 @@ function updateIncomeDisplay(val) {
     document.getElementById('income-display').textContent = formatter.format(val);
 }
 
-// --- BRANCHING LOGIC ---
+// --- BRANCHING LOGIC (Core Needs) ---
 
-// Function to handle the visibility of the detailed breed question
 function showBreedField() {
     const restricted = getRadioValue('restricted_breed');
     const breedField = document.getElementById('breed-field-section');
@@ -33,33 +32,28 @@ function showBreedField() {
         breedField.style.display = 'block';
     } else {
         breedField.style.display = 'none';
-        // Clear the input if it's hidden
         document.getElementById('breed_description').value = '';
     }
 }
 
-// Function to handle the visibility of the main pet details section
 function showPetSections() {
     const hasPets = getRadioValue('pets'); 
     const petDetailsSection = document.getElementById('pet-details-section');
 
     if (hasPets === "Yes") {
         petDetailsSection.style.display = 'block';
-        // Ensure the nested breed field logic runs when this section appears/reappears
         showBreedField(); 
     } else {
         petDetailsSection.style.display = 'none';
-        // Clear pet details radio buttons if 'No' is selected
         document.querySelectorAll('input[name="pet_weight"]').forEach(r => r.checked = false);
         document.querySelectorAll('input[name="restricted_breed"]').forEach(r => r.checked = false);
-        // Hide and clear nested breed field
         document.getElementById('breed-field-section').style.display = 'none';
         document.getElementById('breed_description').value = '';
     }
 }
 
 
-// UPDATED: Handles new order and new "Own place" section
+// --- BRANCHING LOGIC (Current Situation) ---
 function showBranchingSections() {
     const status = getRadioValue('current_housing'); 
     
@@ -67,17 +61,17 @@ function showBranchingSections() {
     document.getElementById('unhoused-section').style.display = 'none';
     document.getElementById('at-risk-section').style.display = 'none';
     document.getElementById('family-section').style.display = 'none';
-    document.getElementById('own-place-section').style.display = 'none'; // New Section
+    document.getElementById('own-place-section').style.display = 'none';
 
     
-    // Show the relevant section based on the new order
+    // Show the relevant section
     if (status === "Currently unhoused") {
         document.getElementById('unhoused-section').style.display = 'block';
-    } else if (status === "Staying with friends or family") { // Value remains "Staying with friends or family" in script to match old input
+    } else if (status === "Staying with friends or family") {
         document.getElementById('family-section').style.display = 'block';
     } else if (status === "At risk of losing housing") {
         document.getElementById('at-risk-section').style.display = 'block';
-    } else if (status === "Own place") { // New value "Own place"
+    } else if (status === "Own place") { 
         document.getElementById('own-place-section').style.display = 'block';
     }
 }
@@ -92,18 +86,14 @@ fetch('housing_data.json')
     })
     .then(data => {
         HOUSING_DATA = data;
-        // Attach the form submission listener
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
         
-        // --- SLIDER LISTENER ATTACHMENT ---
         const incomeSlider = document.getElementById('income-slider');
         
-        // Attach the update function to the 'input' event to make it drag-responsive
         incomeSlider.addEventListener('input', (event) => {
             updateIncomeDisplay(event.target.value);
         });
         
-        // Initial call to hide sections and set initial display value
         showBranchingSections(); 
         showPetSections(); 
         
@@ -116,7 +106,7 @@ fetch('housing_data.json')
             `<h2>Error: Could not load housing data. Check if 'housing_data.json' is in the same folder.</h2>`;
     });
 
-// --- SCORING AND MATCHING LOGIC (Keep for functionality) ---
+// --- SCORING AND MATCHING LOGIC ---
 
 function parseBedroomRange(bedroomStr) {
     if (typeof bedroomStr === 'number') {
@@ -225,7 +215,7 @@ function scoreAgency(agency, answers) {
         }
     }
     
-    // --- SCALING LOGIC: Convert raw score to a 1-10 scale ---
+    // --- SCALING LOGIC ---
     const MIN_RAW_SCORE = -12; 
     const MAX_RAW_SCORE = 17; 
     const RANGE_RAW = MAX_RAW_SCORE - MIN_RAW_SCORE;
@@ -249,7 +239,7 @@ function matchTopAgencies(allData, answers, topN = 3) {
     return scored.slice(0, topN);
 }
 
-// --- FORM DATA COLLECTION ---
+// --- FORM DATA COLLECTION (UPDATED) ---
 
 function getFormAnswers() {
     const incomeSlider = document.getElementById('income-slider');
@@ -261,7 +251,7 @@ function getFormAnswers() {
     const answers = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
-        total_income: baseIncome, // Now reading from slider
+        total_income: baseIncome,
         bedrooms: parseInt(getRadioValue('bedrooms')),
         adults: parseInt(getRadioValue('adults')), 
         kids: parseInt(getRadioValue('kids')), 
@@ -284,13 +274,12 @@ function getFormAnswers() {
     }
 
 
-    // --- UPDATED ADD BRANCHED HOUSING ANSWERS ---
+    // --- ADD BRANCHED HOUSING ANSWERS ---
     if (currentHousing === "Currently unhoused") {
         if (document.getElementById('unhoused-section').style.display === 'block') {
             answers.unhoused_description = document.getElementById('unhoused_desc').value;
             answers.unhoused_how_long = getRadioValue('unhoused_how_long');
             answers.unhoused_where = getRadioValue('unhoused_where');
-            // Removed answers.unhoused_case_manager
         }
     } else if (currentHousing === "At risk of losing housing") {
          if (document.getElementById('at-risk-section').style.display === 'block') {
@@ -309,8 +298,9 @@ function getFormAnswers() {
             answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
             answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
         }
-    } else if (currentHousing === "Own place") { // NEW BRANCH
+    } else if (currentHousing === "Own place") { 
         if (document.getElementById('own-place-section').style.display === 'block') {
+            // CORRECTED: Added the two new required values
             answers.own_afford_length = getRadioValue('own_afford_length');
             answers.own_behind_bills = getRadioValue('own_behind_bills') === 'true';
         }
@@ -318,7 +308,7 @@ function getFormAnswers() {
     return answers;
 }
 
-// --- CSV DOWNLOAD LOGIC (Keep for functionality) ---
+// --- CSV DOWNLOAD LOGIC (Retained) ---
 
 function triggerCSVDownload() {
     if (LAST_ANSWERS && LAST_MATCHES) {
@@ -354,10 +344,7 @@ function displayResults(matches) {
         `;
     });
 
-    // Add the download button after the results
     resultsDiv.innerHTML += `<br><button id="download-csv-button">Download Results CSV</button>`;
-    
-    // Attach the function to the button
     document.getElementById('download-csv-button').onclick = triggerCSVDownload;
 }
 
@@ -425,10 +412,10 @@ function saveResultsAsCSV(answers, topMatches) {
 }
 
 
-// --- MAIN FUNCTION: Runs the matching logic on form submit ---
+// --- MAIN FUNCTION ---
 
 function runSurvey(event) {
-    event.preventDefault(); // Stop the form from submitting normally
+    event.preventDefault(); 
     
     // Basic check for required core radio buttons
     if (
@@ -448,13 +435,11 @@ function runSurvey(event) {
 
     const answers = getFormAnswers();
     
-    // Basic validation for contact info
     if (!answers.name || !answers.email) {
         alert("Please provide your full name and email.");
         return;
     }
     
-    // Check if HOUSING_DATA was successfully loaded
     if (HOUSING_DATA.length === 0) {
         alert("The housing data has not loaded correctly. Check the console for errors.");
         return;
@@ -462,13 +447,10 @@ function runSurvey(event) {
 
     const topMatches = matchTopAgencies(HOUSING_DATA, answers, 3);
     
-    // Store results globally 
     LAST_ANSWERS = answers;
     LAST_MATCHES = topMatches;
     
-    // Display results (which now includes the download button)
     displayResults(topMatches);
 
-    // Scroll to results
     document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 }
