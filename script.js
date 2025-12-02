@@ -239,7 +239,7 @@ function matchTopAgencies(allData, answers, topN = 3) {
     return scored.slice(0, topN);
 }
 
-// --- FORM DATA COLLECTION (UPDATED) ---
+// --- FORM DATA COLLECTION ---
 
 function getFormAnswers() {
     const incomeSlider = document.getElementById('income-slider');
@@ -293,7 +293,6 @@ function getFormAnswers() {
     } else if (currentHousing === "Staying with friends or family") {
         if (document.getElementById('family-section').style.display === 'block') {
             answers.family_description = document.getElementById('family_desc').value;
-            // UPDATED: Now collects the new afford length data
             answers.family_afford_length = getRadioValue('family_afford_length');
             answers.family_contribute = getRadioValue('family_contribute') === 'true';
             answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
@@ -308,7 +307,7 @@ function getFormAnswers() {
     return answers;
 }
 
-// --- CSV DOWNLOAD LOGIC (Retained) ---
+// --- CSV DOWNLOAD LOGIC ---
 
 function triggerCSVDownload() {
     if (LAST_ANSWERS && LAST_MATCHES) {
@@ -332,9 +331,10 @@ function displayResults(matches) {
         
         const formattedScore = match.score.toFixed(1);
 
+        // --- THE LINE BELOW HAS BEEN MODIFIED ---
         resultsDiv.innerHTML += `
             <div class="match-result">
-                <h3>#${index + 1}: ${agency.Organization} (Score: ${formattedScore})</h3>
+                <h3>#${index + 1}: ${agency.Organization} (Score: ${formattedScore}/10 fit)</h3> 
                 <p><strong>Phone:</strong> ${agency.Phone || 'N/A'} | <strong>Address:</strong> ${agency.Address || 'N/A'}</p>
                 <p><strong>Rent Range:</strong> $${agency.Min_Rent} – $${agency.Max_Rent} | <strong>Bedrooms:</strong> ${agency.Bedrooms}</p>
                 <p><strong>Pet Friendly:</strong> ${agency.Pet_Friendly || 'Unknown'} | <strong>Notes:</strong> ${agency.Notes || 'N/A'}</p>
