@@ -217,7 +217,7 @@ function getFormAnswers() {
     // --- ADD BRANCHED ANSWERS ---
     if (currentHousing === "I have my own place") {
         if (document.getElementById('own-place-section').style.display === 'block') {
-            // New Question: Are you behind on rent or utilities?
+            answers.own_place_duration = getRadioValue('own_place_duration'); 
             answers.own_place_behind_bills = getRadioValue('own_place_behind_bills') === 'true'; 
         }
     } else if (currentHousing === "Currently unhoused") {
@@ -226,7 +226,7 @@ function getFormAnswers() {
             answers.unhoused_description = document.getElementById('unhoused_desc').value;
             answers.unhoused_how_long = getRadioValue('unhoused_how_long');
             answers.unhoused_where = getRadioValue('unhoused_where');
-            answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
+            // Removed: answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
         }
     } else if (currentHousing === "At risk of losing housing") {
          if (document.getElementById('at-risk-section').style.display === 'block') {
@@ -241,7 +241,7 @@ function getFormAnswers() {
         if (document.getElementById('family-section').style.display === 'block') {
             answers.family_description = document.getElementById('family_desc').value;
             answers.family_stay_length = getRadioValue('family_stay_length');
-            answers.family_contribute = getRadioValue('family_contribute') === 'true';
+            answers.family_contribute = getRadioValue('family_contribute') === 'true'; 
             answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
             answers.family_perm_plan = getRadioValue('family_perm_plan') === 'true';
         }
