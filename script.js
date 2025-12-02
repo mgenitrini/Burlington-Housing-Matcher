@@ -226,7 +226,7 @@ function getFormAnswers() {
             answers.unhoused_description = document.getElementById('unhoused_desc').value;
             answers.unhoused_how_long = getRadioValue('unhoused_how_long');
             answers.unhoused_where = getRadioValue('unhoused_where');
-            // Removed: answers.unhoused_case_manager = getRadioValue('unhoused_case_manager') === 'true';
+            // 'unhoused_case_manager' has been removed
         }
     } else if (currentHousing === "At risk of losing housing") {
          if (document.getElementById('at-risk-section').style.display === 'block') {
