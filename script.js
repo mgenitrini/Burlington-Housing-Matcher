@@ -343,21 +343,27 @@ function displayResults(matches) {
         
         const formattedScore = match.score.toFixed(1);
 
-        // RENDER: Dedicated section for negative reasons.
+        // RENDER: Dedicated section for negative reasons. (Why this may NOT be a match)
         const negativeSection = match.negativeReasons.length > 0 
             ? `
                 <p><strong>Why this may NOT be a match:</strong></p>
                 <ul>${negativeHtml}</ul>
               `
-            : '<p>No major negative factors identified based on your answers.</p>';
+            : ''; // Changed to empty string if no negative reasons, to avoid displaying a redundant "no negative factors" message when a positive section exists.
             
-        // RENDER: Dedicated section for positive reasons.
+        // RENDER: Dedicated section for positive reasons. (Why this may be a match)
         const positiveSection = match.positiveReasons.length > 0
             ? `
                 <p><strong>Why this may be a match:</strong></p>
                 <ul>${positiveHtml}</ul>
               `
-            : '<p>No specific positive matches identified for this listing beyond basic criteria.</p>';
+            : ''; // Changed to empty string if no positive reasons.
+            
+        // Fallback message if neither section has content
+        const fallbackMessage = (negativeSection === '' && positiveSection === '') 
+            ? '<p>No specific match factors (positive or negative) were identified for this listing based on your answers.</p>'
+            : '';
+
 
         resultsDiv.innerHTML += `
             <div class="match-result">
@@ -366,6 +372,7 @@ function displayResults(matches) {
                 <p><strong>Rent Range:</strong> $${agency.Min_Rent} – $${agency.Max_Rent} | <strong>Bedrooms:</strong> ${agency.Bedrooms}</p>
                 <p><strong>Pet Friendly:</strong> ${agency.Pet_Friendly || 'Unknown'} | <strong>Notes:</strong> ${agency.Notes || 'N/A'}</p>
                 
+                ${fallbackMessage}
                 ${negativeSection}
                 ${positiveSection}
             </div>
