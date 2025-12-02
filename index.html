@@ -35,7 +35,6 @@
                     <input type="range" id="income-slider" name="income" min="0" max="7500" step="100" value="1500" required>
                     <p>Current Income: <span id="income-display">$1,500</span></p>
                 </div>
-
                 <label>Preferred Number of Bedrooms:</label>
                 <div class="radio-group">
                     <label class="radio-option">
@@ -90,10 +89,10 @@
                 <label>Do You Have Pets?</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="pets" value="Yes" required onclick="showPetSections()"> <span>Yes</span>
+                        <input type="radio" name="pets" value="Yes" onclick="showPetSections()"> <span>Yes</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="pets" value="No" onclick="showPetSections()"> <span>No</span>
+                        <input type="radio" name="pets" value="No" required onclick="showPetSections()"> <span>No</span>
                     </label>
                 </div>
                 
@@ -133,10 +132,10 @@
                 <label>Do You Need Accessibility Accommodations? (first floor, ramps, elevators, parking, etc.)</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="Yes" required> <span>Yes</span>
+                        <input type="radio" name="needs_accessible" value="Yes"> <span>Yes</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="needs_accessible" value="No"> <span>No</span>
+                        <input type="radio" name="needs_accessible" value="No" required> <span>No</span>
                     </label>
                 </div>
 
@@ -189,6 +188,16 @@
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="unhoused_where" value="Motel"> <span>Motel</span>
+                    </label>
+                </div>
+
+                <label>Are you working with a case manager?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="unhoused_case_manager" value="true"> <span>Yes</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="unhoused_case_manager" value="false"> <span>No</span>
                     </label>
                 </div>
             </div>
@@ -263,7 +272,7 @@
                         <input type="radio" name="family_stay_length" value="1"> <span>1–3 weeks</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="family_stay_length" value="2"> <span>6 months or longer</span>
+                        <input type="radio" name="family_stay_length" value="2"> <span>2–5 months</span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="family_stay_length" value="3"> <span>1 year or longer</span>
