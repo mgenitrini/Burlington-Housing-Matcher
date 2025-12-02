@@ -343,7 +343,7 @@ function displayResults(matches) {
         
         const formattedScore = match.score.toFixed(1);
 
-        // Determine if the 'Why this may not be a match' section should be displayed (BOLDED HEADER)
+        // RENDER: Dedicated section for negative reasons.
         const negativeSection = match.negativeReasons.length > 0 
             ? `
                 <p><strong>Why this may NOT be a match:</strong></p>
@@ -351,7 +351,7 @@ function displayResults(matches) {
               `
             : '<p>No major negative factors identified based on your answers.</p>';
             
-        // Determine if the 'Why this may be a match' section should be displayed (BOLDED HEADER)
+        // RENDER: Dedicated section for positive reasons.
         const positiveSection = match.positiveReasons.length > 0
             ? `
                 <p><strong>Why this may be a match:</strong></p>
