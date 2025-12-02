@@ -128,7 +128,8 @@ function parseBedroomRange(bedroomStr) {
 
 function scoreAgency(agency, answers) {
     let score = 0;
-    let reasons = [];
+    let positiveReasons = [];
+    let negativeReasons = [];
 
     const minRent = agency.Min_Rent || 0;
     const maxRent = agency.Max_Rent || 1000000;
@@ -148,71 +149,70 @@ function scoreAgency(agency, answers) {
         const budgetMax = monthlyIncome / 3;
         if (minRent <= budgetMax) {
             score += 3;
-            reasons.push("Rent range roughly fits your income (below 33% of income).");
+            positiveReasons.push("Rent range roughly fits your income (below 33% of income).");
         } else if (minRent <= budgetMax * 1.2) { // 33% to 40% of income
             score += 1;
-            reasons.push("Rent is a bit high, using 33%-40% of income, but possibly workable.");
+            positiveReasons.push("Rent is a bit high, using 33%-40% of income, but possibly workable.");
         } else {
             score -= 4;
-            // NOTE FOR RENT TOO HIGH
-            reasons.push("**WARNING: Rent may be too high for your current income (over 40% of income).**");
+            negativeReasons.push("Rent may be too high for your current income (over 40% of income).");
         }
     }
 
     // 2. Bedroom match
     if (minBeds <= bedroomPref && bedroomPref <= maxBeds) {
         score += 3;
-        reasons.push(`Offers your preferred ${bedroomPref} bedroom(s).`);
+        positiveReasons.push(`Offers your preferred ${bedroomPref} bedroom(s).`);
     } else {
         score -= 1;
-        reasons.push("Bedroom count may not fit your preference.");
+        negativeReasons.push("Bedroom count may not fit your preference.");
     }
 
     // 3. Pets
     if (pets === 'Yes') { 
         if (petFriendly) {
             score += 2;
-            reasons.push("Pet friendly.");
+            positiveReasons.push("Pet friendly.");
             
             const isLargeOrRestricted = answers.pet_weight === 'Yes' || answers.restricted_breed === 'Yes' || answers.restricted_breed === "I don't know";
             
             if (isLargeOrRestricted) {
                 score -= 1;
-                reasons.push("NOTE: Your pet may be large or a restricted breed, which could incur extra fees or property specific rules.");
+                negativeReasons.push("Your pet may be large or a restricted breed, which could incur extra fees or property specific rules.");
             }
 
         } else {
             score -= 6;
-            reasons.push("May not allow pets.");
+            negativeReasons.push("Does not allow pets.");
         }
     }
 
     // 4. Family-friendly tag 
     if (kids > 0 && matchTags.includes("family-friendly")) {
         score += 2;
-        reasons.push("Flagged as family-friendly due to having kids.");
+        positiveReasons.push("Flagged as family-friendly due to having kids.");
     }
 
     // 5. Accessibility
     if (needsAccessible === "Yes") { 
         if (matchTags.includes("accessible") || matchTags.includes("accessibility-support")) {
             score += 2;
-            reasons.push("May be more accessible-friendly.");
+            positiveReasons.push("May be more accessible-friendly.");
         } else {
             score -= 1;
-            reasons.push("Accessibility features not clearly listed.");
+            negativeReasons.push("Accessibility features not clearly listed.");
         }
     }
     
-    // 6. Current housing situation (Simple score for unhoused/at-risk remains)
+    // 6. Current housing situation
     if (currentHousing === "Currently unhoused" || currentHousing === "At risk of losing housing") {
         if (minRent <= 1100) {
             score += 2;
-            reasons.push("Lower starting rent, possibly more reachable for current situation.");
+            positiveReasons.push("Lower starting rent, possibly more reachable for current situation.");
         }
         if (matchTags.includes("voucher-friendly")) {
             score += 3;
-            reasons.push("Tagged as voucher-friendly.");
+            positiveReasons.push("Tagged as voucher-friendly.");
         }
     }
     
@@ -227,13 +227,20 @@ function scoreAgency(agency, answers) {
     scaledScore = Math.max(1.0, Math.min(10.0, scaledScore));
     scaledScore = Math.round(scaledScore * 10) / 10;
 
-    return { score: scaledScore, reasons };
+    // Return the final score and both sets of reasons
+    return { 
+        score: scaledScore, 
+        // Combine reasons for backward compatibility (e.g., CSV)
+        reasons: [...positiveReasons, ...negativeReasons], 
+        positiveReasons: positiveReasons, 
+        negativeReasons: negativeReasons
+    };
 }
 
 function matchTopAgencies(allData, answers, topN = 3) {
     const scored = allData.map(agency => {
-        const { score, reasons } = scoreAgency(agency, answers);
-        return { score, agency, reasons };
+        const { score, reasons, positiveReasons, negativeReasons } = scoreAgency(agency, answers);
+        return { score, agency, reasons, positiveReasons, negativeReasons };
     });
     
     scored.sort((a, b) => b.score - a.score);
@@ -294,7 +301,6 @@ function getFormAnswers() {
     } else if (currentHousing === "Staying with friends or family") {
         if (document.getElementById('family-section').style.display === 'block') {
             answers.family_description = document.getElementById('family_desc').value;
-            // Name changed to family_afford_length
             answers.family_afford_length = getRadioValue('family_afford_length'); 
             answers.family_contribute = getRadioValue('family_contribute') === 'true';
             answers.family_on_lease = getRadioValue('family_on_lease') === 'true';
@@ -329,9 +335,29 @@ function displayResults(matches) {
 
     matches.forEach((match, index) => {
         const agency = match.agency;
-        const reasonsHtml = match.reasons.map(r => `<li>${r}</li>`).join('');
+        
+        // Use the dedicated positive and negative reason arrays
+        const positiveHtml = match.positiveReasons.map(r => `<li>${r}</li>`).join('');
+        // Add a red color style to negative reasons for visual warning
+        const negativeHtml = match.negativeReasons.map(r => `<li style="color: darkred;">${r}</li>`).join('');
         
         const formattedScore = match.score.toFixed(1);
+
+        // Determine if the 'Why this may not be a match' section should be displayed
+        const negativeSection = match.negativeReasons.length > 0 
+            ? `
+                <p><strong>Why this may not be a match:</strong></p>
+                <ul>${negativeHtml}</ul>
+              `
+            : '<p>No major negative factors identified based on your answers.</p>';
+            
+        // Determine if the 'Why this matched' section should be displayed
+        const positiveSection = match.positiveReasons.length > 0
+            ? `
+                <p><strong>Why this matched:</strong></p>
+                <ul>${positiveHtml}</ul>
+              `
+            : '<p>No specific positive matches identified for this listing beyond basic criteria.</p>';
 
         resultsDiv.innerHTML += `
             <div class="match-result">
@@ -339,8 +365,9 @@ function displayResults(matches) {
                 <p><strong>Phone:</strong> ${agency.Phone || 'N/A'} | <strong>Address:</strong> ${agency.Address || 'N/A'}</p>
                 <p><strong>Rent Range:</strong> $${agency.Min_Rent} – $${agency.Max_Rent} | <strong>Bedrooms:</strong> ${agency.Bedrooms}</p>
                 <p><strong>Pet Friendly:</strong> ${agency.Pet_Friendly || 'Unknown'} | <strong>Notes:</strong> ${agency.Notes || 'N/A'}</p>
-                <p><strong>Why this matched:</strong></p>
-                <ul>${reasonsHtml}</ul>
+                
+                ${negativeSection}
+                ${positiveSection}
             </div>
         `;
     });
@@ -383,6 +410,7 @@ function saveResultsAsCSV(answers, topMatches) {
 
     topMatches.forEach((match, index) => {
         const agency = match.agency;
+        // Use the combined reasons array for CSV output compatibility
         const reasons = match.reasons.join("; "); 
         
         const escape = (text) => `"${String(text).replace(/"/g, '""')}"`;
