@@ -20,7 +20,7 @@ h1 {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
 }
 
-/* --- Logo Styling --- */
+/* --- Logo Styling (Correct Hat Position) --- */
 #title-section {
     text-align: center;
     margin-bottom: 20px;
@@ -49,7 +49,7 @@ h1 {
     font-weight: 600;
 }
 
-/* Question Font Size */
+/* Question Font Size (Big and Clear) */
 label { 
     display: block; 
     font-weight: 600; 
@@ -72,61 +72,52 @@ input[type="text"]:focus, input[type="email"]:focus {
     outline: none;
 }
 
-/* --- Radio Group Styling (SIMPLE, STACKED, AND RELIABLE) --- */
+/* --- Radio Group Styling (RELIABLE STACKED LAYOUT) --- */
 .radio-group {
-    display: block; /* Ensures stacking */
+    display: block; /* Ensures the options stack vertically */
     margin-top: 10px;
 }
 
-.radio-group label {
+/* Style for each answer option wrapper */
+.radio-option {
+    display: block; /* Makes each option take full width */
     margin-top: 5px;
-    display: block; /* Each option on its own line */
-    cursor: pointer;
     background: #f7f9fc; 
     padding: 12px;
     border-radius: 6px;
     border: 1px solid #e1e9f1;
     transition: background-color 0.2s;
+    font-size: 1em; 
 }
 
-.radio-group label:hover {
-    background-color: #e6f0f9; 
-}
-
-/* Keep the actual radio circle visible for reliability, but style the label well */
-.radio-group input[type="radio"] {
-    margin-right: 10px;
-    /* You can customize the size of the native radio button here */
-    transform: scale(1.1); 
-}
-
-/* Make the selected option stand out clearly */
-.radio-group input[type="radio"]:checked + span {
-    font-weight: 700;
-    color: #102a43; /* Darker text for selected option */
-}
-
-
-/* --- Checkbox Styling for Other Factors (Same concept) --- */
-/* Targeting the parent label for the "Other Factors" checkboxes */
-.form-group:nth-child(5) > label {
+/* Make the whole block clickable */
+.radio-option label {
     display: flex;
     align-items: center;
-    font-size: 1.05em; /* Slightly smaller question font for checkbox group */
-    background: #f7f9fc;
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid #e1e9f1;
-    margin-top: 10px; /* Space between checkbox options */
-}
-.form-group:nth-child(5) > label:hover {
-    background-color: #e6f0f9;
-}
-.form-group:nth-child(5) input[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.1);
+    margin: 0; /* Remove top margin from label inside option */
+    font-size: 1em; /* Reset font size for the option text */
+    font-weight: 400; /* Regular weight for option text */
 }
 
+/* Style the native radio button */
+.radio-option input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.1); 
+    /* Remove any strange sizing or hidden attributes */
+    opacity: 1; 
+    width: auto;
+    height: auto;
+}
+
+/* Highlight the selected option text */
+.radio-option input[type="radio"]:checked + span {
+    font-weight: 700;
+    color: #102a43;
+}
+/* Highlight the container on selection */
+.radio-option input[type="radio"]:checked {
+    border-color: #2e86de;
+}
 
 /* --- Button Styles (Submit/Download) --- */
 button {
