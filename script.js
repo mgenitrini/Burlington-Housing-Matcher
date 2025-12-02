@@ -184,9 +184,10 @@ function getFormAnswers() {
         pets: parseInt(getRadioValue('pets')),
         needs_accessible: getRadioValue('needs_accessible'),
         current_housing: currentHousing,
-        eviction: document.getElementById('eviction').checked, 
-        criminal_record: document.getElementById('criminal_record').checked,
-        needs_transit: document.getElementById('needs_transit').checked,
+        // ✅ CORRECTED LINES: These now correctly read the "Yes" or "No" value from the radio group NAME
+        eviction: getRadioValue('eviction'), 
+        criminal_record: getRadioValue('criminal_record'),
+        needs_transit: getRadioValue('needs_transit'),
     };
 
     // --- ADD BRANCHED ANSWERS ---
@@ -276,6 +277,7 @@ function saveResultsAsCSV(answers, topMatches) {
     for (const key in answers) {
         if (answers.hasOwnProperty(key) && !excludedKeys.includes(key)) {
             let value = answers[key];
+            // CRITICAL FIX: Ensures that true/false values are converted to Yes/No in the CSV
             if (typeof value === 'boolean') {
                 value = value ? 'Yes' : 'No';
             }
