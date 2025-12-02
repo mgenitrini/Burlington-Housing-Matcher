@@ -1,10 +1,10 @@
 /* --- Global Styles --- */
 body { 
-    font-family: 'Montserrat', Arial, sans-serif; /* Use the linked Google Font */
+    font-family: 'Montserrat', Arial, sans-serif; 
     max-width: 800px; 
     margin: 0 auto; 
     padding: 20px; 
-    background-color: #f4f7f6; /* Light background */
+    background-color: #f4f7f6; 
 }
 h1 {
     color: #333;
@@ -19,21 +19,16 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Logo Styling (Integrated with Title) --- */
+/* --- Logo Styling (Corrected Size and Position) --- */
 #title-section {
-    /* Ensures the entire title/logo block is centered */
     text-align: center;
 }
-
 #form-logo {
-    /* CRITICAL FIX: Sets the height to 0.8em for a smaller size next to the text */
+    /* Ensures the image is very small, next to the text */
     height: 0.8em; 
     width: auto;
-    /* Aligns the image with the center of the text */
     vertical-align: middle; 
-    /* Add a little space between the text and the image */
     margin-left: 10px; 
-    /* Ensures it sits in line with the text */
     display: inline; 
 }
 
@@ -64,7 +59,7 @@ input[type="text"], input[type="email"] {
     box-sizing: border-box; 
 }
 
-/* --- Radio Group Styling --- */
+/* --- Radio Group Styling (SIMPLIFIED FOR BROADER COMPATIBILITY) --- */
 .radio-group {
     display: flex;
     flex-wrap: wrap;
@@ -81,30 +76,15 @@ input[type="text"], input[type="email"] {
 .radio-option:hover {
     background-color: #d1d1d1;
 }
-.radio-option input[type="radio"] {
-    /* Hide the default radio button circle */
-    opacity: 0; 
-    width: 0;
-    height: 0;
-}
 /* Style for checked state */
-.radio-group input[type="radio"]:checked + .radio-option {
-    background-color: #007bff; /* Blue background when selected */
-    color: white;
-    font-weight: 700;
-    border: 2px solid #0056b3;
+.radio-option input[type="radio"]:checked {
+    /* This highlights the option text when selected */
+    outline: 2px solid #0056b3;
+    outline-offset: 2px;
 }
-/* Re-styled radio option span to look like text */
-.radio-option span {
-    display: inline-block;
-    padding: 0;
-    margin: 0;
-}
-/* Style the label wrapper for better click target */
+/* Ensure the label margin is reset correctly */
 .radio-group label {
     margin-top: 0;
-    padding: 0;
-    display: flex;
 }
 
 
