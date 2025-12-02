@@ -13,7 +13,42 @@ function getRadioValue(name) {
 
 // --- BRANCHING LOGIC ---
 
-// This function is called by the 'onclick' event in index.html
+// Function to handle the visibility of the detailed breed question
+function showBreedField() {
+    const restricted = getRadioValue('restricted_breed');
+    const breedField = document.getElementById('breed-field-section');
+    
+    if (restricted === "I don't know") {
+        breedField.style.display = 'block';
+    } else {
+        breedField.style.display = 'none';
+        // Clear the input if it's hidden
+        document.getElementById('breed_description').value = '';
+    }
+}
+
+// Function to handle the visibility of the main pet details section
+function showPetSections() {
+    const hasPets = getRadioValue('pets'); 
+    const petDetailsSection = document.getElementById('pet-details-section');
+
+    if (hasPets === "Yes") {
+        petDetailsSection.style.display = 'block';
+        // Ensure the nested breed field logic runs when this section appears/reappears
+        showBreedField(); 
+    } else {
+        petDetailsSection.style.display = 'none';
+        // Clear pet details radio buttons if 'No' is selected
+        document.querySelectorAll('input[name="pet_weight"]').forEach(r => r.checked = false);
+        document.querySelectorAll('input[name="restricted_breed"]').forEach(r => r.checked = false);
+        // Hide and clear nested breed field
+        document.getElementById('breed-field-section').style.display = 'none';
+        document.getElementById('breed_description').value = '';
+    }
+}
+
+
+// This function is called by the 'onclick' event in index.html for current housing
 function showBranchingSections() {
     const status = getRadioValue('current_housing'); 
     
@@ -47,6 +82,7 @@ fetch('housing_data.json')
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
         // Initial call to hide sections on page load
         showBranchingSections(); 
+        showPetSections(); 
     })
     .catch(error => {
         console.error("Could not load housing data:", error);
@@ -85,11 +121,12 @@ function scoreAgency(agency, answers) {
     const matchTags = (agency.Match_Tags || []).map(t => t.toLowerCase());
 
     const monthlyIncome = answers.total_income; 
-    const pets = answers.pets;
+    const pets = answers.pets; 
     const bedroomPref = answers.bedrooms;
-    const dependents = answers.dependents;
+    const kids = answers.kids;
     const currentHousing = answers.current_housing;
-    const needsAccessible = answers.needs_accessible;
+    // UPDATED: needsAccessible will be 'Yes' or 'No'
+    const needsAccessible = answers.needs_accessible; 
 
     // 1. Affordability
     if (monthlyIncome > 0) {
@@ -116,24 +153,32 @@ function scoreAgency(agency, answers) {
     }
 
     // 3. Pets
-    if (pets > 0) {
+    if (pets === 'Yes') { 
         if (petFriendly) {
             score += 2;
             reasons.push("Pet friendly.");
+            
+            const isLargeOrRestricted = answers.pet_weight === 'Yes' || answers.restricted_breed === 'Yes' || answers.restricted_breed === "I don't know";
+            
+            if (isLargeOrRestricted) {
+                score -= 1;
+                reasons.push("NOTE: Your pet may be large or a restricted breed, which could incur extra fees or property specific rules.");
+            }
+
         } else {
             score -= 6;
             reasons.push("May not allow pets.");
         }
     }
 
-    // 4. Family-friendly tag
-    if (dependents > 0 && matchTags.includes("family-friendly")) {
+    // 4. Family-friendly tag 
+    if (kids > 0 && matchTags.includes("family-friendly")) {
         score += 2;
-        reasons.push("Flagged as family-friendly.");
+        reasons.push("Flagged as family-friendly due to having kids.");
     }
 
     // 5. Accessibility
-    if (needsAccessible === "true") {
+    if (needsAccessible === "Yes") { // UPDATED: Checks for 'Yes'
         if (matchTags.includes("accessible") || matchTags.includes("accessibility-support")) {
             score += 2;
             reasons.push("May be more accessible-friendly.");
@@ -172,25 +217,37 @@ function matchTopAgencies(allData, answers, topN = 3) {
 
 function getFormAnswers() {
     const baseIncome = parseInt(getRadioValue('income'));
-    const partnerIncome = parseInt(getRadioValue('partner_income'));
     const currentHousing = getRadioValue('current_housing');
+    const hasPets = getRadioValue('pets');
     
     const answers = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
-        total_income: baseIncome + partnerIncome,
+        total_income: baseIncome, 
         bedrooms: parseInt(getRadioValue('bedrooms')),
-        dependents: parseInt(getRadioValue('dependents')),
-        pets: parseInt(getRadioValue('pets')),
+        adults: parseInt(getRadioValue('adults')), 
+        kids: parseInt(getRadioValue('kids')), 
+        pets: hasPets, 
+        // UPDATED: Collecting 'Yes' or 'No' string
         needs_accessible: getRadioValue('needs_accessible'),
         current_housing: currentHousing,
-        // ✅ CORRECTED LINES: These now correctly read the "Yes" or "No" value from the radio group NAME
         eviction: getRadioValue('eviction'), 
         criminal_record: getRadioValue('criminal_record'),
         needs_transit: getRadioValue('needs_transit'),
     };
+    
+    // --- ADD CONDITIONAL PET ANSWERS ---
+    if (hasPets === "Yes") {
+        answers.pet_weight = getRadioValue('pet_weight');
+        answers.restricted_breed = getRadioValue('restricted_breed');
+        
+        if (answers.restricted_breed === "I don't know") {
+            answers.breed_description = document.getElementById('breed_description').value;
+        }
+    }
 
-    // --- ADD BRANCHED ANSWERS ---
+
+    // --- ADD BRANCHED HOUSING ANSWERS ---
     if (currentHousing === "Currently unhoused") {
         // Only collect values if the section is visible
         if (document.getElementById('unhoused-section').style.display === 'block') {
@@ -327,10 +384,27 @@ function saveResultsAsCSV(answers, topMatches) {
 function runSurvey(event) {
     event.preventDefault(); // Stop the form from submitting normally
     
-    // Check if required radio buttons are selected
-    if (!getRadioValue('income') || !getRadioValue('partner_income') || !getRadioValue('bedrooms') || !getRadioValue('dependents') || !getRadioValue('pets') || !getRadioValue('needs_accessible') || !getRadioValue('current_housing')) {
+    // CORE QUESTIONS VALIDATION
+    if (!getRadioValue('income') || !getRadioValue('bedrooms') || !getRadioValue('adults') || !getRadioValue('kids') || !getRadioValue('pets') || !getRadioValue('needs_accessible') || !getRadioValue('current_housing')) {
         alert("Please answer all required core questions.");
         return;
+    }
+
+    // CONDITIONAL PET QUESTIONS VALIDATION
+    if (getRadioValue('pets') === 'Yes') {
+        if (!getRadioValue('pet_weight') || !getRadioValue('restricted_breed')) {
+            alert("Please answer all required pet details questions.");
+            return;
+        }
+        
+        // Validation for the nested text field
+        if (getRadioValue('restricted_breed') === "I don't know") {
+            const breedDesc = document.getElementById('breed_description').value.trim();
+            if (breedDesc === "") {
+                alert("Please specify the breed of your pet.");
+                return;
+            }
+        }
     }
 
     const answers = getFormAnswers();
