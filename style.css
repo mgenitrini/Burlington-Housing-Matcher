@@ -44,13 +44,13 @@ h1 {
     padding-bottom: 5px;
     margin-top: 0;
 }
-/* *** FIX 1: INCREASE QUESTION FONT SIZE *** */
+/* Question Font Size */
 label { 
     display: block; 
     font-weight: 600; 
     margin-top: 15px; 
-    font-size: 1.1em; /* Made question text slightly larger */
-    color: #333; /* Darker text for questions */
+    font-size: 1.1em; 
+    color: #333; 
 }
 input[type="text"], input[type="email"] { 
     width: 100%; 
@@ -61,25 +61,29 @@ input[type="text"], input[type="email"] {
     box-sizing: border-box; 
 }
 
-/* --- Radio Group Styling (IMPROVED BUTTON APPEARANCE) --- */
+/* --- Radio Group Styling (NEW STACKED BUTTON STYLE) --- */
 .radio-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    /* *** KEY CHANGE 1: Display as block to stack options *** */
+    display: block; 
+    gap: 0; /* Remove gap */
     margin-top: 5px;
 }
-/* This is the visual 'button' wrapper */
+/* Style the entire label/option box */
 .radio-option {
     background: #e9e9e9;
-    padding: 8px 15px;
-    border-radius: 20px;
+    /* *** KEY CHANGE 2: Bigger padding and square corners *** */
+    padding: 12px 15px;
+    border-radius: 4px; /* Square corners */
     cursor: pointer;
-    transition: background-color 0.2s, box-shadow 0.2s; /* Added box-shadow transition */
-    font-size: 0.95em; /* Slightly smaller text for the options */
+    transition: background-color 0.2s, box-shadow 0.2s;
+    font-size: 1em; 
     font-weight: 500;
     color: #555;
-    /* Removed default radio circle entirely */
     position: relative;
+    /* *** KEY CHANGE 3: Full width and space between buttons *** */
+    display: block;
+    width: 100%;
+    margin-top: 5px; 
 }
 .radio-option:hover {
     background-color: #d1d1d1;
@@ -98,39 +102,44 @@ input[type="text"], input[type="email"] {
     cursor: pointer;
 }
 
-/* *** FIX 2: HIGHLIGHT WHEN CLICKED/CHECKED *** */
+/* Highlight when clicked/checked */
 .radio-option input[type="radio"]:checked + span {
-    /* When the radio is checked, target the text span inside the label */
-    background-color: #007bff; /* Primary Blue Background */
-    color: white; /* White text */
+    background-color: #007bff; 
+    color: white; 
     border: 2px solid #0056b3;
-    box-shadow: 0 0 8px rgba(0, 86, 179, 0.5); /* Glowing effect */
+    box-shadow: 0 0 8px rgba(0, 86, 179, 0.5); 
 }
-/* Re-styled radio option span to fill the container */
+/* Make the text span fill the new button area */
 .radio-option span {
-    display: inline-block;
+    display: block;
     padding: 0;
     margin: 0;
-    /* Ensure the span covers the whole label for highlight effect */
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    line-height: 2.5; /* Center text vertically */
-    text-align: center;
-    border-radius: 20px;
+    /* Center text vertically within the button */
+    line-height: 2.7; 
+    text-align: left; /* Align text to the left */
+    border-radius: 4px;
     box-sizing: border-box;
+    padding-left: 15px; /* Indent the text */
     transition: background-color 0.2s;
+    /* Ensure the text is visible */
+    color: inherit; 
+    font-weight: inherit;
+    font-size: inherit;
 }
 
 /* Reset margin for radio group labels */
 .radio-group label {
     margin-top: 0;
+    display: block; /* Ensures each option is on its own line */
 }
 
 
-/* --- Button Styles --- */
+/* --- Button Styles (Submit/Download) --- */
 button {
     background-color: #007bff;
     color: white;
