@@ -11,7 +11,7 @@ function getRadioValue(name) {
     return element ? element.value : null;
 }
 
-// --- NEW FUNCTION: Update the income display in real-time ---
+// --- FUNCTION: Update the income display in real-time ---
 function updateIncomeDisplay(val) {
     const formatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -21,9 +21,7 @@ function updateIncomeDisplay(val) {
     });
     document.getElementById('income-display').textContent = formatter.format(val);
 }
-
-// *** FIX: Make the function globally accessible for the HTML oninput handler ***
-window.updateIncomeDisplay = updateIncomeDisplay; 
+// Removed: window.updateIncomeDisplay = updateIncomeDisplay; (Listener is now attached below)
 
 
 // --- BRANCHING LOGIC ---
@@ -95,12 +93,21 @@ fetch('housing_data.json')
         HOUSING_DATA = data;
         // Attach the event listener to the form AFTER the data has loaded
         document.getElementById('housing-survey').addEventListener('submit', runSurvey);
+        
+        // --- NEW SLIDER LISTENER ATTACHMENT ---
+        const incomeSlider = document.getElementById('income-slider');
+        
+        // Attach the update function to the 'input' event
+        incomeSlider.addEventListener('input', (event) => {
+            updateIncomeDisplay(event.target.value);
+        });
+        
         // Initial call to hide sections on page load
         showBranchingSections(); 
         showPetSections(); 
         
         // INITIALIZE SLIDER DISPLAY
-        const initialIncome = document.getElementById('income-slider').value;
+        const initialIncome = incomeSlider.value;
         updateIncomeDisplay(initialIncome);
     })
     .catch(error => {
@@ -234,7 +241,7 @@ function matchTopAgencies(allData, answers, topN = 3) {
 // --- FORM DATA COLLECTION ---
 
 function getFormAnswers() {
-    // UPDATED: Reading from the slider element directly
+    // Reading from the slider element directly
     const incomeSlider = document.getElementById('income-slider');
     const baseIncome = parseInt(incomeSlider.value);
 
