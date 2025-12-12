@@ -9,10 +9,10 @@
     "Max_Rent": 1200,
     "Min_Credit": 0,
     "Voucher_Friendly": "Yes",
-    "Pet_Friendly": "Varies",
+    "Pet_Friendly": "Service animals only",
     "Bedrooms": "1-4",
-    "Notes": "Public housing, elderly/disabled housing, and voucher programs in Burlington. Many clients struggle with landlord acceptance of vouchers, credit requirements, and wait times.",
-    "Match_Tags": ["voucher-friendly", "public-housing", "low-income", "accessibility-support"]
+    "Notes": "BHA manages 6 communities owned by BDC Investment Communities, LLC. Multifamily housing, 2 elderly/disabled exclusive communities in Burlington. No vouchers accepted except 1 community has vouchers administered by Asheboro Housing Authority, the other 5 communities are Project Based Rental Assistance (PBRA), has waitlist. Eligibility determined by HUD guidelines. Rent is based on income.",
+    "Match_Tags": ["voucher-friendly", "public-housing", "low-income", "accessibility-support", "elderly-disabled", "income-based"]
   },
   {
     "Organization": "Burlington Rentals",
